@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <main>
+        <section>
+            <h2>Create Category</h2>
+            <form id="category-form">
+                <label for="category-name">Category Name</label>
+                <input type="text" id="category-name" placeholder="e.g. Beverages" required>
+                <button type="submit">Add Category</button>
+            </form>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>Create Item</h2>
+            <form id="item-form">
+                <label for="item-name">Item Name</label>
+                <input type="text" id="item-name" placeholder="e.g. Cola" required>
+
+                <label for="item-code">Item Code</label>
+                <input type="text" id="item-code" placeholder="e.g. SKU-0001" required>
+
+                <label for="item-price">Item Price</label>
+                <input type="number" id="item-price" step="0.01" min="0" placeholder="0.00" required>
+
+                <label for="item-buying-price">Buying Price (optional)</label>
+                <input type="number" id="item-buying-price" step="0.01" min="0" placeholder="0.00">
+
+                <label for="item-discount-price">Discount Price (optional)</label>
+                <input type="number" id="item-discount-price" step="0.01" min="0" placeholder="0.00">
+
+                <label for="item-stock">Item Stock</label>
+                <input type="number" id="item-stock" step="1" min="0" placeholder="0" required>
+
+                <label for="item-category">Category</label>
+                <select id="item-category" required></select>
+
+                <button type="submit">Add Item</button>
+            </form>
+        </section>
+
+        <hr>
+
+        <section>
+            <h2>Browse Items</h2>
+            <div id="category-buttons"></div>
+            <div id="items-grid"></div>
+        </section>
+    </main>
+
+    <form id="for-load-pruchising-item-modify">
+        <input type="text" id="forpurchesingitemid" placeholder="Item ID" required>
+        <input type="text" id="forpurchesingitemname" placeholder="Item Name" required>
+        <input type="number" id="forpurchesingitemqntload" placeholder="Item QNT" required>
+        <input type="number" id="forpurchesingitempriceload" placeholder="Original Price" required>
+        <!-- This field is the discounted / selling price per item (if provided it will override Original Price) -->
+        <input type="number" id="forpurchesingitemdiscount" placeholder="Discounted Price (per item, overrides Price)">
+        <button type="submit">Done</button>
+      </form>
+    
+      <table id="itemsTable">
+        <thead>
+          <tr>
+            <th>Item ID</th>
+            <th>Item Name</th>
+            <th>QNT</th>
+            <th>Original Price</th>
+            <th>Discounted Price</th>
+            <th>Total</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    
+      <div id="summaryBox">
+        <div>Grand Total: <span id="grandTotal">0.00</span></div>
+        <div>Item Count: <span id="itemCount">0</span></div>
+        <div>
+          Customer Amount:
+          <input type="number" id="customerAmount" placeholder="Enter amount" step="0.01">
+        </div>
+        <div>Balance (Total - Customer): <span id="balance">0.00</span></div>
+
+        <button id="completeBill">Complete</button>
+        <button id="nextBill">Next Bill</button>
+      </div>
+    
+      <script>
+        const form = document.getElementById("for-load-pruchising-item-modify");
+        const tableBody = document.getElementById("tableBody");
+        const grandTotalCell = document.getElementById("grandTotal");
+        const itemCountCell = document.getElementById("itemCount");
+        const customerAmountInput = document.getElementById("customerAmount");
+        const balanceCell = document.getElementById("balance");
+        const nextBillBtn = document.getElementById("nextBill");
+    
+        let grandTotal = 0;
+        let totalQuantity = 0; // sum of QNT across all rows
+    
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+    
+          const itemId = document.getElementById("forpurchesingitemid").value.trim();
+          const itemName = document.getElementById("forpurchesingitemname").value.trim();
+          const itemQnt = parseFloat(document.getElementById("forpurchesingitemqntload").value);
+          const itemPrice = parseFloat(document.getElementById("forpurchesingitempriceload").value);
+          const itemDiscountPrice = parseFloat(document.getElementById("forpurchesingitemdiscount").value);
+    
+          if (!itemId || !itemName || isNaN(itemQnt) || isNaN(itemPrice)) {
+            alert("Please fill all fields correctly.");
+            return;
+          }
+    
+          // Interpret the discount field as the discounted/selling price per item.
+          // If the user entered a positive discounted price, use it; otherwise use the original price.
+          const salePrice = (!isNaN(itemDiscountPrice) && itemDiscountPrice > 0) ? itemDiscountPrice : itemPrice;
+    
+          // Total = salePrice * quantity
+          const total = (itemQnt * salePrice).toFixed(2);
+    
+          const newRow = tableBody.insertRow();
+          newRow.innerHTML = `
+            <td>${escapeHtml(itemId)}</td>
+            <td>${escapeHtml(itemName)}</td>
+            <td>${itemQnt}</td>
+            <td>${itemPrice.toFixed(2)}</td>
+            <td>${salePrice.toFixed(2)}</td>
+            <td class="rowTotal">${total}</td>
+            <td><button class="delete-btn">Delete</button></td>
+          `;
+    
+          grandTotal += parseFloat(total);
+          totalQuantity += itemQnt;
+          updateSummary();
+          form.reset();
+        });
+    
+        // Delete handler
+        tableBody.addEventListener("click", function (e) {
+          if (e.target.classList.contains("delete-btn")) {
+            const row = e.target.closest("tr");
+            const rowTotal = parseFloat(row.querySelector(".rowTotal").textContent);
+            const rowQnt = parseFloat(row.children[2].textContent) || 0;
+            grandTotal -= rowTotal;
+            totalQuantity -= rowQnt;
+            row.remove();
+            updateSummary();
+          }
+        });
+    
+        customerAmountInput.addEventListener("input", updateSummary);
+
+        if (nextBillBtn) {
+          nextBillBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            // Clear table
+            tableBody.innerHTML = "";
+            // Reset totals
+            grandTotal = 0;
+            totalQuantity = 0;
+            // Clear inputs
+            form.reset();
+            customerAmountInput.value = "";
+            updateSummary();
+          });
+        }
+    
+        function updateSummary() {
+          grandTotalCell.textContent = grandTotal.toFixed(2);
+          itemCountCell.textContent = totalQuantity;
+    
+          const customerAmount = parseFloat(customerAmountInput.value) || 0;
+          const balance = grandTotal - customerAmount;
+          balanceCell.textContent = balance.toFixed(2);
+          balanceCell.style.color = balance > 0 ? "red" : "green";
+        }
+    
+        // Simple HTML escape for safety in table cells
+        function escapeHtml(text) {
+          return text.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+        }
+      </script>
+    
+    <script type="module" src="./js/firebase_config.js"></script>
+    <script type="module" src="./js/items.js"></script>
+</body>
+</html>
