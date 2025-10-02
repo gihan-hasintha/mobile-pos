@@ -262,19 +262,43 @@ async function handleCreateItem(event) {
   await loadItems();
 }
 
-// Function to generate bill number with timestamp
-function generateBillNumber() {
+// Function to generate bill number with sequential counter
+async function generateBillNumber() {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
   
-  // Generate bill number with date and time: YYYYMMDDHHMMSS
-  const billNumber = `${year}${month}${day}${hours}${minutes}${seconds}`;
-  return billNumber;
+  const datePrefix = `${year}${month}${day}`;
+  
+  // Get or create counter for today
+  const counterDocId = `bill_counter_${datePrefix}`;
+  const counterRef = doc(countersCollection, counterDocId);
+  
+  try {
+    const result = await runTransaction(db, async (transaction) => {
+      const counterSnap = await transaction.get(counterRef);
+      
+      let currentCount = 1;
+      if (counterSnap.exists()) {
+        currentCount = (counterSnap.data().count || 0) + 1;
+        transaction.update(counterRef, { count: currentCount });
+      } else {
+        transaction.set(counterRef, { count: currentCount, date: datePrefix });
+      }
+      
+      // Format counter with leading zeros (3 digits)
+      const formattedCounter = String(currentCount).padStart(3, '0');
+      return `${datePrefix}${formattedCounter}`;
+    });
+    
+    return result;
+  } catch (error) {
+    console.error('Error generating bill number:', error);
+    // Fallback to timestamp-based if counter fails
+    const timestamp = Date.now().toString().slice(-6);
+    return `${datePrefix}${timestamp}`;
+  }
 }
 
 async function handleCompleteBill() {
@@ -308,7 +332,7 @@ async function handleCompleteBill() {
     return acc;
   }, {});
 
-  const billNumber = generateBillNumber();
+  const billNumber = await generateBillNumber();
   
   // Create formatted date string like "October 2, 2025 at 6:02:03 PM UTC+5:30"
   const now = new Date();
