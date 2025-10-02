@@ -1,5 +1,5 @@
 // Items and Categories form logic
-import { db } from "./firebase_config.js";
+import { db, rtdb } from "./firebase_config.js";
 import {
   collection,
   addDoc,
@@ -13,12 +13,19 @@ import {
   increment,
   setDoc
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import {
+  ref,
+  push
+} from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
 const categoriesCollection = collection(db, "categories");
 const itemsCollection = collection(db, "items");
-const billsCollection = collection(db, "bills");
+const billsCollection = collection(db, "bills"); // Keep for reference, but we'll use RTDB for new bills
 const customersCollection = collection(db, "customer");
 const countersCollection = collection(db, "counters");
+
+// Realtime Database references
+const rtdbBillsRef = ref(rtdb, 'bills');
 
 let cachedCategories = [];
 let cachedItems = [];
@@ -255,50 +262,19 @@ async function handleCreateItem(event) {
   await loadItems();
 }
 
-// Function to generate bill number with today's date and sequential invoice number
-async function generateBillNumber() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  const datePrefix = `${year}${month}${day}`;
+// Function to generate bill number with timestamp
+function generateBillNumber() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const seconds = String(now.getSeconds()).padStart(2, '0');
   
-  // Counter document ID based on today's date
-  const counterDocId = `bill-counter-${datePrefix}`;
-  const counterRef = doc(countersCollection, counterDocId);
-  
-  try {
-    // Use transaction to get and increment counter atomically
-    const result = await runTransaction(db, async (transaction) => {
-      const counterDoc = await transaction.get(counterRef);
-      
-      let nextNumber = 1;
-      if (counterDoc.exists()) {
-        nextNumber = (counterDoc.data().count || 0) + 1;
-        transaction.update(counterRef, { count: nextNumber });
-      } else {
-        // Create new counter document for today
-        transaction.set(counterRef, { 
-          count: nextNumber,
-          date: datePrefix,
-          createdAt: serverTimestamp()
-        });
-      }
-      
-      // Format invoice number with leading zeros (001, 002, etc.)
-      const invoiceNumber = String(nextNumber).padStart(3, '0');
-      const billNumber = `${datePrefix}${invoiceNumber}`;
-      
-      return billNumber;
-    });
-    
-    return result;
-  } catch (error) {
-    console.error("Error generating bill number:", error);
-    // Fallback to timestamp-based number if counter fails
-    const timestamp = Date.now().toString().slice(-6);
-    return `${datePrefix}${timestamp}`;
-  }
+  // Generate bill number with date and time: YYYYMMDDHHMMSS
+  const billNumber = `${year}${month}${day}${hours}${minutes}${seconds}`;
+  return billNumber;
 }
 
 async function handleCompleteBill() {
@@ -332,24 +308,32 @@ async function handleCompleteBill() {
     return acc;
   }, {});
 
+  const billNumber = generateBillNumber();
+  
+  // Create formatted date string like "October 2, 2025 at 6:02:03 PM UTC+5:30"
   const now = new Date();
-  const localDate = now.toLocaleDateString();
-  const localTime = now.toLocaleTimeString();
-
-  const billNumber = await generateBillNumber();
+  const options = {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    timeZoneName: 'short'
+  };
+  const formattedDate = now.toLocaleString('en-US', options);
 
   const bill = {
     grandTotal,
     itemCount,
     lines,
-    createdAt: serverTimestamp(),
+    createdAt: formattedDate,
     billNumber,
-    date: localDate,
-    time: localTime,
   };
 
   try {
-    // First, validate stock and then decrement stock atomically per item using a transaction
+    // First, validate stock and then decrement stock atomically per item using a Firestore transaction
+    // Then save bill to Realtime Database for speed
     const result = await runTransaction(db, async (transaction) => {
       // Validate available stock first (aggregated per item)
       for (const [itemId, qty] of Object.entries(quantityByItemId)) {
@@ -366,21 +350,21 @@ async function handleCompleteBill() {
         }
       }
 
-      // Create bill with generated id inside the transaction
-      const billRef = doc(billsCollection);
-      transaction.set(billRef, bill);
-
       // Decrement stock atomically per item using increment()
       for (const [itemId, qty] of Object.entries(quantityByItemId)) {
         const itemRef = doc(itemsCollection, itemId);
         transaction.update(itemRef, { stock: increment(-Number(qty || 0)) });
       }
 
-      // Return both bill id and bill number
-      return { billId: billRef.id, billNumber };
+      // Return bill number for later use
+      return { billNumber };
     });
 
-    alert(`Bill #${result.billNumber} saved and stock updated.`);
+    // Save bill to Realtime Database for faster access
+    const billRef = await push(rtdbBillsRef, bill);
+    const finalResult = { billId: billRef.key, billNumber: result.billNumber };
+
+    alert(`Bill #${finalResult.billNumber} saved and stock updated.`);
 
     // Update cached stock for offline accuracy
     if (window.updateCachedStock) {
