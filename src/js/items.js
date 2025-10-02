@@ -6,12 +6,19 @@ import {
   getDocs,
   query,
   orderBy,
-  serverTimestamp
+  serverTimestamp,
+  doc,
+  getDoc,
+  runTransaction,
+  increment,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
 const categoriesCollection = collection(db, "categories");
 const itemsCollection = collection(db, "items");
 const billsCollection = collection(db, "bills");
+const customersCollection = collection(db, "customer");
+const countersCollection = collection(db, "counters");
 
 let cachedCategories = [];
 let cachedItems = [];
@@ -138,7 +145,20 @@ function renderItemsGrid() {
     card.appendChild(price);
     card.appendChild(stock);
 
-    card.addEventListener("click", () => populatePurchaseForm(item));
+    const numericStock = Number(item.stock || 0);
+    if (numericStock <= 0) {
+      const notice = document.createElement("p");
+      notice.textContent = "This item is out of stock";
+      notice.style.color = "#b00020"; // red
+      notice.style.fontWeight = "bold";
+      card.appendChild(notice);
+      card.style.opacity = "0.6";
+      card.style.pointerEvents = "none"; // disable clicking
+      card.title = "Out of stock";
+    } else {
+      card.addEventListener("click", () => populatePurchaseForm(item));
+      card.style.cursor = "pointer";
+    }
 
     grid.appendChild(card);
   });
@@ -235,10 +255,56 @@ async function handleCreateItem(event) {
   await loadItems();
 }
 
+// Function to generate bill number with today's date and sequential invoice number
+async function generateBillNumber() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const datePrefix = `${year}${month}${day}`;
+  
+  // Counter document ID based on today's date
+  const counterDocId = `bill-counter-${datePrefix}`;
+  const counterRef = doc(countersCollection, counterDocId);
+  
+  try {
+    // Use transaction to get and increment counter atomically
+    const result = await runTransaction(db, async (transaction) => {
+      const counterDoc = await transaction.get(counterRef);
+      
+      let nextNumber = 1;
+      if (counterDoc.exists()) {
+        nextNumber = (counterDoc.data().count || 0) + 1;
+        transaction.update(counterRef, { count: nextNumber });
+      } else {
+        // Create new counter document for today
+        transaction.set(counterRef, { 
+          count: nextNumber,
+          date: datePrefix,
+          createdAt: serverTimestamp()
+        });
+      }
+      
+      // Format invoice number with leading zeros (001, 002, etc.)
+      const invoiceNumber = String(nextNumber).padStart(3, '0');
+      const billNumber = `${datePrefix}${invoiceNumber}`;
+      
+      return billNumber;
+    });
+    
+    return result;
+  } catch (error) {
+    console.error("Error generating bill number:", error);
+    // Fallback to timestamp-based number if counter fails
+    const timestamp = Date.now().toString().slice(-6);
+    return `${datePrefix}${timestamp}`;
+  }
+}
+
 async function handleCompleteBill() {
-  const tableBody = document.getElementById("tableBody");
-  const rows = tableBody ? Array.from(tableBody.querySelectorAll("tr")) : [];
-  if (rows.length === 0) {
+  const cartList = document.getElementById("cartList");
+  const cards = cartList ? Array.from(cartList.querySelectorAll(".cart-card")) : [];
+  if (cards.length === 0) {
     alert("No items to bill.");
     return;
   }
@@ -248,35 +314,87 @@ async function handleCompleteBill() {
   const grandTotal = Number(grandTotalText);
   const itemCount = Number(itemCountText);
 
-  const lines = rows.map((row) => {
-    const cells = row.querySelectorAll("td");
-    return {
-      itemId: cells[0].textContent,
-      name: cells[1].textContent,
-      quantity: Number(cells[2].textContent),
-      salePrice: Number(cells[4].textContent),
-      total: Number(cells[5].textContent)
-    };
+  const lines = cards.map((card) => {
+    const itemId = card.dataset.itemId || "";
+    const name = card.dataset.itemName || "";
+    const quantity = Number(card.dataset.quantity || "0");
+    const salePrice = Number(card.dataset.salePrice || card.dataset.price || "0");
+    const total = Number(card.dataset.total || String(quantity * salePrice));
+    return { itemId, name, quantity, salePrice, total };
   });
+
+  // Combine quantities by item to ensure correct validation and atomic updates
+  const quantityByItemId = lines.reduce((acc, line) => {
+    const id = (line.itemId || "").trim();
+    const qty = Number(line.quantity || 0);
+    if (!id) return acc;
+    acc[id] = (acc[id] || 0) + qty;
+    return acc;
+  }, {});
 
   const now = new Date();
   const localDate = now.toLocaleDateString();
   const localTime = now.toLocaleTimeString();
+
+  const billNumber = await generateBillNumber();
 
   const bill = {
     grandTotal,
     itemCount,
     lines,
     createdAt: serverTimestamp(),
+    billNumber,
+    date: localDate,
+    time: localTime,
   };
 
   try {
-    const ref = await addDoc(billsCollection, bill);
-    alert(`Bill saved. ID: ${ref.id}`);
-    // Clear table and summary
+    // First, validate stock and then decrement stock atomically per item using a transaction
+    const result = await runTransaction(db, async (transaction) => {
+      // Validate available stock first (aggregated per item)
+      for (const [itemId, qty] of Object.entries(quantityByItemId)) {
+        const itemRef = doc(itemsCollection, itemId);
+        const itemSnap = await transaction.get(itemRef);
+        if (!itemSnap.exists()) {
+          throw new Error(`Item not found: ${itemId}`);
+        }
+        const data = itemSnap.data();
+        const currentStock = Number(data.stock || 0);
+        if (qty > currentStock) {
+          const name = data.name || itemId;
+          throw new Error(`Insufficient stock for ${name}. In stock: ${currentStock}, requested: ${qty}`);
+        }
+      }
+
+      // Create bill with generated id inside the transaction
+      const billRef = doc(billsCollection);
+      transaction.set(billRef, bill);
+
+      // Decrement stock atomically per item using increment()
+      for (const [itemId, qty] of Object.entries(quantityByItemId)) {
+        const itemRef = doc(itemsCollection, itemId);
+        transaction.update(itemRef, { stock: increment(-Number(qty || 0)) });
+      }
+
+      // Return both bill id and bill number
+      return { billId: billRef.id, billNumber };
+    });
+
+    alert(`Bill #${result.billNumber} saved and stock updated.`);
+
+    // Update cached stock for offline accuracy
+    if (window.updateCachedStock) {
+      for (const [itemId, qty] of Object.entries(quantityByItemId)) {
+        window.updateCachedStock(itemId, qty);
+      }
+    }
+
+
+    // Reload items to reflect new stock values
+    await loadItems();
   } catch (err) {
     console.error(err);
-    alert("Failed to save bill");
+    alert(err && err.message ? err.message : "Failed to save bill");
   }
 }
 
@@ -294,6 +412,36 @@ function setupForms() {
     e.preventDefault();
     handleCompleteBill();
   });
+
+  // Customer form handler
+  const customerForm = document.getElementById("customer-form");
+  if (customerForm) {
+    customerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nameEl = document.getElementById("customerName");
+      const phoneEl = document.getElementById("customerPhone");
+      const name = nameEl && nameEl.value ? nameEl.value.trim() : "";
+      const phone = phoneEl && phoneEl.value ? phoneEl.value.trim() : "";
+
+      if (!name) {
+        alert("Customer name is required");
+        return;
+      }
+
+      try {
+        await addDoc(customersCollection, {
+          name,
+          phone: phone || null,
+          createdAt: serverTimestamp(),
+        });
+        if (customerForm && typeof customerForm.reset === "function") customerForm.reset();
+        alert("Customer saved");
+      } catch (err) {
+        console.error(err);
+        alert("Failed to save customer");
+      }
+    });
+  }
 }
 
 window.addEventListener("DOMContentLoaded", async () => {

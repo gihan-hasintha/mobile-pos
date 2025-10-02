@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Items</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <main>
+    <h2>Manage Items</h2>
+
+    <section>
+      <h3>Browse Items</h3>
+      <div id="manage-category-buttons"></div>
+      <div id="manage-items-grid"></div>
+    </section>
+
+    <hr>
+
+    <section id="manage-details" style="display:none;">
+      <h3 id="manage-details-title">Item Details</h3>
+      <div id="manage-summary"></div>
+      <div style="margin: 8px 0;">
+        <button id="btn-edit-details">Edit Details</button>
+        <button id="btn-add-stock">Add Stock</button>
+        <button id="btn-clear-selection">Clear</button>
+      </div>
+
+      <form id="manage-item-form" style="display:none;">
+        <h4>Edit Item Details</h4>
+        <label for="m-item-name">Item Name</label>
+        <input type="text" id="m-item-name" required>
+
+        <label for="m-item-code">Item Code</label>
+        <input type="text" id="m-item-code" required>
+
+        <label for="m-item-price">Item Price</label>
+        <input type="number" id="m-item-price" step="0.01" min="0" required>
+
+        <label for="m-item-discount">Discount Price (optional)</label>
+        <input type="number" id="m-item-discount" step="0.01" min="0">
+
+        <label for="m-item-buying">Buying Price (optional)</label>
+        <input type="number" id="m-item-buying" step="0.01" min="0">
+
+        <label for="m-item-stock">Current Stock</label>
+        <input type="number" id="m-item-stock" step="1" min="0" disabled>
+
+        <label for="m-item-category">Category</label>
+        <select id="m-item-category" required></select>
+
+        <button type="submit">Save Changes</button>
+      </form>
+
+      <form id="add-stock-form" style="display:none;">
+        <h4>Add Stock</h4>
+        <label for="add-stock-amount">Add Quantity</label>
+        <input type="number" id="add-stock-amount" step="1" min="1" required>
+        <button type="submit">Add Stock</button>
+      </form>
+    </section>
+
+    <p>
+      <a href="home.html">Back to Home</a>
+    </p>
+  </main>
+
+  <script type="module" src="./js/firebase_config.js"></script>
+  <script type="module" src="./js/manage_items.js"></script>
+</body>
+</html>
+
+
