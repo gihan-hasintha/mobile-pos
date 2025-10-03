@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Awesome Capacitor App</title>
+    <meta
+      name="viewport"
+      content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+
+    <script
+      type="module"
+      src="https://unpkg.com/@ionic/pwa-elements@latest/dist/ionicpwaelements/ionicpwaelements.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/@ionic/pwa-elements@latest/dist/ionicpwaelements/ionicpwaelements.js"
+    ></script>
+
+    <link rel="icon" type="image/x-icon" href="./assets/icon/favicon.ico" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <meta name="theme-color" content="#31d53d" />
+  </head>
+  <body>
+    <capacitor-welcome></capacitor-welcome>
+
+    <section style="padding: 15px;">
+      <h2>USB Thermal Printer (Page)</h2>
+      <p>
+        <button id="list-usb-page">List USB Printers</button>
+        <button id="print-usb-page">Print Test (USB)</button>
+      </p>
+      <div>
+        <h3>Printers</h3>
+        <ul id="printers-page"></ul>
+      </div>
+      <p id="printer-status-page"></p>
+    </section>
+
+    <main>
+      <section style="display: none;">
+          <h2>Create Category</h2>
+          <form id="category-form">
+              <label for="category-name">Category Name</label>
+              <input type="text" id="category-name" placeholder="e.g. Beverages" required>
+              <button type="submit">Add Category</button>
+          </form>
+      </section>
+
+      <section style="display: block;">
+          <h2>Create Item</h2>
+          <form id="item-form">
+              <label for="item-name">Item Name</label>
+              <input type="text" id="item-name" placeholder="e.g. Cola" required>
+
+              <label for="item-code">Item Code</label>
+              <input type="text" id="item-code" placeholder="e.g. SKU-0001" required>
+
+              <label for="item-price">Item Price</label>
+              <input type="number" id="item-price" step="0.01" min="0" placeholder="0.00" required>
+
+              <label for="item-buying-price">Buying Price (optional)</label>
+              <input type="number" id="item-buying-price" step="0.01" min="0" placeholder="0.00">
+
+              <label for="item-discount-price">Discount Price (optional)</label>
+              <input type="number" id="item-discount-price" step="0.01" min="0" placeholder="0.00">
+
+              <label for="item-stock">Item Stock</label>
+              <input type="number" id="item-stock" step="1" min="0" placeholder="0" required>
+
+              <label for="item-category">Category</label>
+              <select id="item-category" required></select>
+
+              <button type="submit">Add Item</button>
+          </form>
+      </section>
+
+      <hr>
+
+      <section>
+          <h2>Browse Items</h2>
+          <div style="margin-bottom: 10px;">
+              <span id="cache-status" style="font-size: 12px; color: #666;">Cache: Loading...</span>
+              <button id="refresh-cache-btn" style="margin-left: 10px; font-size: 12px; padding: 2px 8px;">Refresh Stock Data</button>
+          </div>
+          <div id="category-buttons"></div>
+          <div id="items-grid"></div>
+      </section>
+  </main>
+
+  <div id="listf-or-cart-and-another-functions">
+    <form id="for-load-pruchising-item-modify">
+      <input type="text" id="forpurchesingitemid" placeholder="Item ID" required>
+      <input type="text" id="forpurchesingitemname" placeholder="Item Name" required>
+      <input type="number" id="forpurchesingitemqntload" placeholder="Item QNT" required>
+      <input type="number" id="forpurchesingitempriceload" placeholder="Original Price" required>
+      <!-- This field is the discounted / selling price per item (if provided it will override Original Price) -->
+      <input type="number" id="forpurchesingitemdiscount" placeholder="Discounted Price (per item, overrides Price)">
+      <button type="submit">Done</button>
+    </form>
+  
+    <div id="cartList" class="cart-list"></div>
+  
+    <div id="summaryBox">
+      <div>Grand Total: <span id="grandTotal">0.00</span></div>
+      <div>Item Count: <span id="itemCount">0</span></div>
+      <div>
+        Customer Amount:
+        <input type="number" id="customerAmount" placeholder="Enter amount" step="0.01">
+      </div>
+      <div>Balance (Total - Customer): <span id="balance">0.00</span></div>
+
+      <button id="completeBill">Complete</button>
+      <button id="nextBill">Next Bill</button>
+    </div>
+
+    <form id="customer-form">
+      <input type="text" id="customerName" placeholder="Customer Name">
+      <input type="text" id="customerPhone" placeholder="Customer Phone">
+      <button type="submit">Save</button>
+    </form>
+  </div>
+
+  <script type="module">
+    import { rtdb } from "./js/firebase_config.js";
+    import { ref, get } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+    
+    const rtdbItemsRef = ref(rtdb, 'items');
+    const form = document.getElementById("for-load-pruchising-item-modify");
+    const cartList = document.getElementById("cartList");
+    const grandTotalCell = document.getElementById("grandTotal");
+    const itemCountCell = document.getElementById("itemCount");
+    const customerAmountInput = document.getElementById("customerAmount");
+    const balanceCell = document.getElementById("balance");
+    const nextBillBtn = document.getElementById("nextBill");
+
+    // Cache for offline stock validation
+    let cachedItemsForStock = new Map(); // itemId -> {stock, name, price, etc}
+    let lastCacheUpdate = 0;
+    const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+    // Load items into cache for offline validation
+    async function loadItemsCache() {
+      const statusEl = document.getElementById("cache-status");
+      try {
+        if (statusEl) statusEl.textContent = "Cache: Loading...";
+        
+        const snap = await get(rtdbItemsRef);
+        cachedItemsForStock.clear();
+        const itemsData = [];
+        if (snap.exists()) {
+          const val = snap.val() || {};
+          Object.keys(val).forEach((key) => {
+            const data = val[key] || {};
+            const itemData = {
+              id: key,
+              name: data.name || '',
+              stock: Number(data.stock || 0),
+              price: Number(data.price || 0),
+              discountPrice: data.discountPrice ? Number(data.discountPrice) : null
+            };
+            cachedItemsForStock.set(key, itemData);
+            itemsData.push(itemData);
+          });
+          // sort by name for consistency
+          itemsData.sort((a,b) => String(a.name||'').localeCompare(String(b.name||'')));
+        }
+        
+        // Save to localStorage for offline access
+        localStorage.setItem('itemsCache', JSON.stringify(itemsData));
+        localStorage.setItem('itemsCacheTime', Date.now().toString());
+        
+        lastCacheUpdate = Date.now();
+        const timeStr = new Date(lastCacheUpdate).toLocaleTimeString();
+        if (statusEl) {
+          statusEl.textContent = `Cache: ${cachedItemsForStock.size} items loaded at ${timeStr} (Online)`;
+          statusEl.style.color = "#28a745"; // green
+        }
+        console.log(`Loaded ${cachedItemsForStock.size} items into cache for offline validation`);
+      } catch (error) {
+        console.error("Error loading items cache:", error);
+        // Try to load from localStorage as fallback
+        await loadFromLocalStorage();
+      }
+    }
+
+    // Load from localStorage when offline
+    async function loadFromLocalStorage() {
+      const statusEl = document.getElementById("cache-status");
+      try {
+        const cachedData = localStorage.getItem('itemsCache');
+        const cacheTime = localStorage.getItem('itemsCacheTime');
+        
+        if (cachedData && cacheTime) {
+          const itemsData = JSON.parse(cachedData);
+          cachedItemsForStock.clear();
+          
+          itemsData.forEach(item => {
+            cachedItemsForStock.set(item.id, item);
+          });
+          
+          lastCacheUpdate = parseInt(cacheTime);
+          const timeStr = new Date(lastCacheUpdate).toLocaleTimeString();
+          if (statusEl) {
+            statusEl.textContent = `Cache: ${cachedItemsForStock.size} items from ${timeStr} (Offline)`;
+            statusEl.style.color = "#ffc107"; // yellow
+          }
+          console.log(`Loaded ${cachedItemsForStock.size} items from localStorage (offline mode)`);
+        } else {
+          if (statusEl) {
+            statusEl.textContent = "Cache: No offline data available";
+            statusEl.style.color = "#dc3545"; // red
+          }
+        }
+      } catch (error) {
+        console.error("Error loading from localStorage:", error);
+        if (statusEl) {
+          statusEl.textContent = "Cache: Error loading offline data";
+          statusEl.style.color = "#dc3545"; // red
+        }
+      }
+    }
+
+    // Check if cache needs refresh
+    function isCacheExpired() {
+      return (Date.now() - lastCacheUpdate) > CACHE_DURATION;
+    }
+
+    // Get item from cache with auto-refresh
+    async function getCachedItem(itemId) {
+      // Refresh cache if expired or empty
+      if (cachedItemsForStock.size === 0 || isCacheExpired()) {
+        await loadItemsCache();
+      }
+      return cachedItemsForStock.get(itemId);
+    }
+
+    // Update cached stock locally (for offline accuracy)
+    function updateCachedStock(itemId, quantityUsed) {
+      const cachedItem = cachedItemsForStock.get(itemId);
+      if (cachedItem) {
+        cachedItem.stock = Math.max(0, cachedItem.stock - quantityUsed);
+        cachedItemsForStock.set(itemId, cachedItem);
+        
+        // Update localStorage as well
+        try {
+          const itemsData = Array.from(cachedItemsForStock.values());
+          localStorage.setItem('itemsCache', JSON.stringify(itemsData));
+        } catch (error) {
+          console.error("Error updating localStorage:", error);
+        }
+      }
+    }
+
+    // Make cache functions globally available for other modules
+    window.updateCachedStock = updateCachedStock;
+    window.loadItemsCache = loadItemsCache;
+
+    // Initialize cache when page loads
+    loadItemsCache();
+
+    // Setup refresh button
+    const refreshBtn = document.getElementById("refresh-cache-btn");
+    if (refreshBtn) {
+      refreshBtn.addEventListener("click", async () => {
+        refreshBtn.disabled = true;
+        refreshBtn.textContent = "Refreshing...";
+        await loadItemsCache();
+        refreshBtn.disabled = false;
+        refreshBtn.textContent = "Refresh Stock Data";
+      });
+    }
+
+    let grandTotal = 0;
+    let totalQuantity = 0; // sum of QNT across all rows
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const itemId = document.getElementById("forpurchesingitemid").value.trim();
+      const itemName = document.getElementById("forpurchesingitemname").value.trim();
+      const itemQnt = parseFloat(document.getElementById("forpurchesingitemqntload").value);
+      const itemPrice = parseFloat(document.getElementById("forpurchesingitempriceload").value);
+      const itemDiscountPrice = parseFloat(document.getElementById("forpurchesingitemdiscount").value);
+
+      if (!itemId || !itemName || isNaN(itemQnt) || isNaN(itemPrice)) {
+        alert("Please fill all fields correctly.");
+        return;
+      }
+
+      // Check stock availability before adding to cart (using cached data for speed)
+      try {
+        const cachedItem = await getCachedItem(itemId);
+        
+        if (!cachedItem) {
+          alert(`Item with ID "${itemId}" not found. Please check the item ID.`);
+          return;
+        }
+        
+        const availableStock = cachedItem.stock;
+        
+        // Calculate quantity already in cart for this item
+        const existingCards = cartList.querySelectorAll('.cart-card');
+        let quantityInCart = 0;
+        existingCards.forEach(card => {
+          if (card.dataset.itemId === itemId) {
+            quantityInCart += parseFloat(card.dataset.quantity || 0);
+          }
+        });
+        
+        const totalRequestedQuantity = quantityInCart + itemQnt;
+        
+        if (totalRequestedQuantity > availableStock) {
+          alert(`Cannot add ${itemQnt} items to cart. Available stock: ${availableStock}, Already in cart: ${quantityInCart}, You tried to add: ${itemQnt}. Total would be: ${totalRequestedQuantity}`);
+          return;
+        }
+
+        // Auto-fill item name and price from cache if not provided or different
+        if (itemName !== cachedItem.name) {
+          document.getElementById("forpurchesingitemname").value = cachedItem.name;
+        }
+        if (isNaN(itemPrice) || itemPrice === 0) {
+          document.getElementById("forpurchesingitempriceload").value = cachedItem.price;
+          // Update the local variable
+          const updatedPrice = cachedItem.price;
+          if (cachedItem.discountPrice) {
+            document.getElementById("forpurchesingitemdiscount").value = cachedItem.discountPrice;
+          }
+        }
+      } catch (error) {
+        console.error("Error checking stock:", error);
+        alert("Error checking stock availability. Please try again.");
+        return;
+      }
+
+      // Interpret the discount field as the discounted/selling price per item.
+      // If the user entered a positive discounted price, use it; otherwise use the original price.
+      const salePrice = (!isNaN(itemDiscountPrice) && itemDiscountPrice > 0) ? itemDiscountPrice : itemPrice;
+
+      // Total = salePrice * quantity
+      const total = (itemQnt * salePrice).toFixed(2);
+
+      const card = document.createElement("div");
+      card.className = "cart-card";
+      card.dataset.itemId = itemId;
+      card.dataset.itemName = itemName;
+      card.dataset.quantity = String(itemQnt);
+      card.dataset.price = String(itemPrice);
+      card.dataset.salePrice = String(salePrice);
+      card.dataset.total = String(total);
+
+      card.innerHTML = `
+        <div class="cart-card-title">${escapeHtml(itemName)}</div>
+        <div class="cart-card-sub">PRICE : ${itemPrice.toFixed(2)} | DIS. PRICE : ${salePrice.toFixed(2)} | QNT : ${itemQnt}</div>
+        <div class="cart-card-total">TOTAL : ${total}</div>
+        <div class="cart-card-actions">
+          <button class="edit-btn">EDIT</button>
+          <button class="delete-btn">DELETE</button>
+        </div>
+      `;
+      cartList.appendChild(card);
+
+      grandTotal += parseFloat(total);
+      totalQuantity += itemQnt;
+      updateSummary();
+      form.reset();
+    });
+
+    // Card actions (Edit / Delete)
+    cartList.addEventListener("click", function (e) {
+      const target = e.target;
+      if (!(target instanceof Element)) return;
+      const card = target.closest(".cart-card");
+      if (!card) return;
+
+      const cardTotal = parseFloat(card.dataset.total || "0");
+      const cardQnt = parseFloat(card.dataset.quantity || "0");
+
+      if (target.classList.contains("delete-btn")) {
+        grandTotal -= cardTotal;
+        totalQuantity -= cardQnt;
+        card.remove();
+        updateSummary();
+        return;
+      }
+
+      if (target.classList.contains("edit-btn")) {
+        // Prefill the input form with existing values and remove the card
+        document.getElementById("forpurchesingitemid").value = card.dataset.itemId || "";
+        document.getElementById("forpurchesingitemname").value = card.dataset.itemName || "";
+        document.getElementById("forpurchesingitemqntload").value = card.dataset.quantity || "1";
+        document.getElementById("forpurchesingitempriceload").value = card.dataset.price || "0";
+        document.getElementById("forpurchesingitemdiscount").value = card.dataset.salePrice || "";
+
+        grandTotal -= cardTotal;
+        totalQuantity -= cardQnt;
+        card.remove();
+        updateSummary();
+      }
+    });
+
+    customerAmountInput.addEventListener("input", updateSummary);
+
+    if (nextBillBtn) {
+      nextBillBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        // Clear cards
+        cartList.innerHTML = "";
+        // Reset totals
+        grandTotal = 0;
+        totalQuantity = 0;
+        // Clear inputs
+        form.reset();
+        customerAmountInput.value = "";
+        updateSummary();
+      });
+    }
+
+    function updateSummary() {
+      grandTotalCell.textContent = grandTotal.toFixed(2);
+      itemCountCell.textContent = totalQuantity;
+
+      const customerAmount = parseFloat(customerAmountInput.value) || 0;
+      const balance = grandTotal - customerAmount;
+      balanceCell.textContent = balance.toFixed(2);
+      balanceCell.style.color = balance > 0 ? "red" : "green";
+    }
+
+    // Simple HTML escape for safety in table cells
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+    }
+  </script>
+
+<script type="module" src="./js/firebase_config.js"></script>
+<script type="module" src="./js/items.js"></script>
+
+
+    <script src="./js/capacitor-welcome.js" type="module"></script>
+  </body>
+</html>
