@@ -49,10 +49,6 @@
 
         <section>
             <h2>Browse Items</h2>
-            <div style="margin-bottom: 10px;">
-                <span id="cache-status" style="font-size: 12px; color: #666;">Cache: Loading...</span>
-                <button id="refresh-cache-btn" style="margin-left: 10px; font-size: 12px; padding: 2px 8px;">Refresh Stock Data</button>
-            </div>
             <div id="category-buttons"></div>
             <div id="items-grid"></div>
         </section>
@@ -227,20 +223,11 @@
         window.updateCachedStock = updateCachedStock;
         window.loadItemsCache = loadItemsCache;
 
-        // Initialize cache when page loads
+        // Initialize cache when page loads and auto-refresh in background
         loadItemsCache();
-
-        // Setup refresh button
-        const refreshBtn = document.getElementById("refresh-cache-btn");
-        if (refreshBtn) {
-          refreshBtn.addEventListener("click", async () => {
-            refreshBtn.disabled = true;
-            refreshBtn.textContent = "Refreshing...";
-            await loadItemsCache();
-            refreshBtn.disabled = false;
-            refreshBtn.textContent = "Refresh Stock Data";
-          });
-        }
+        setInterval(() => {
+          loadItemsCache();
+        }, CACHE_DURATION);
 
         // Helper: find item by code (barcode)
         async function findItemByCode(code) {
