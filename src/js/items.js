@@ -86,11 +86,12 @@ function renderCategoryButtons() {
   const container = document.getElementById("category-buttons");
   if (!container) return;
   container.innerHTML = "";
+  container.className = "category-bar";
 
   const allBtn = document.createElement("button");
   allBtn.textContent = "All";
   allBtn.dataset.categoryId = "all";
-  if (activeCategoryId === "all") allBtn.disabled = true;
+  allBtn.className = "category-chip" + (activeCategoryId === "all" ? " active" : "");
   allBtn.addEventListener("click", () => {
     activeCategoryId = "all";
     renderCategoryButtons();
@@ -102,7 +103,7 @@ function renderCategoryButtons() {
     const btn = document.createElement("button");
     btn.textContent = cat.name;
     btn.dataset.categoryId = cat.id;
-    if (activeCategoryId === cat.id) btn.disabled = true;
+    btn.className = "category-chip" + (activeCategoryId === cat.id ? " active" : "");
     btn.addEventListener("click", () => {
       activeCategoryId = cat.id;
       renderCategoryButtons();

@@ -125,3 +125,36 @@ button { padding: 6px 12px; cursor: pointer; }
 .expense-sub { font-size: 12px; opacity: .85; margin-bottom: 6px; }
 .expense-time { font-size: 11px; opacity: .75; }
 .expense-notes { margin-top: 6px; font-size: 12px; opacity: .9; }
+
+/* Category horizontal scroll bar */
+#category-buttons { width: 100%; }
+.category-bar {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.category-bar::-webkit-scrollbar { height: 0px; }
+.category-bar::-webkit-scrollbar-thumb { background: #ffffff26; border-radius: 4px; }
+.category-chip {
+  background: #ffffff;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 8px 14px;
+  white-space: nowrap;
+  font-weight: 600;
+  cursor: pointer;
+}
+.category-chip.active {
+  background: #2f6bff;
+  border-color: #2f6bff;
+  color: #ffffff;
+}
+
+.category-buttons-content {
+  width: 95%;
+  padding-top: 10px;
+  margin: 0 auto;
+}
