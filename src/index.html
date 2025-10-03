@@ -23,11 +23,12 @@
     <link rel="manifest" href="./manifest.json" />
     <link rel="stylesheet" href="./css/style.css" />
     <meta name="theme-color" content="#31d53d" />
+    <script src="https://unpkg.com/html5-qrcode"></script>
   </head>
   <body>
     <capacitor-welcome></capacitor-welcome>
 
-    <section style="padding: 15px;">
+    <section style="padding: 15px;display: none;">
       <h2>USB Thermal Printer (Page)</h2>
       <p>
         <button id="list-usb-page">List USB Printers</button>
@@ -39,6 +40,29 @@
       </div>
       <p id="printer-status-page"></p>
     </section>
+
+    <div id="navigation-bar-for-application-head">
+      <div class="navigation-bar-for-application-head-navbar">
+        <div class="navigation-bar-for-application-head-content">
+          <div class="navigation-bar-for-application-head-content-left">
+            <div class="navigation-bar-for-application-head-content-left-btn-for-show-shopping-cart">
+              <div class="navigation-bar-for-application-head-content-left-btn-for-show-shopping-cart-img">
+                <img src="./assets/imgs/shopping_bag_speed_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+              </div>
+              <div class="navigation-bar-for-application-head-content-left-btn-for-show-shopping-cart-text-for-show-results">150</div>
+            </div>
+          </div>
+          <div class="navigation-bar-for-application-head-content-center">
+asd
+          </div>
+          <div class="navigation-bar-for-application-head-content-right">
+sdsdas
+          </div>
+        </div>
+      </div>
+      
+      <div class="navigation-bar-for-application-head-navbar-space"></div>
+    </div>
 
     <main>
       <section style="display: none;">
@@ -80,8 +104,6 @@
       </section>
       </div>
 
-      <hr>
-
       <section>
           <h2>Browse Items</h2>
           <div style="margin-bottom: 10px;">
@@ -94,6 +116,8 @@
   </main>
 
   <div id="listf-or-cart-and-another-functions">
+    
+  <div id="reader"></div>
     <input type="text" id="Enterbarcodetoloaditemdetails" placeholder="Enter barcode to load item details">
     <form id="for-load-pruchising-item-modify">
       <input type="text" id="forpurchesingitemid" placeholder="Item ID" required>
@@ -293,7 +317,32 @@
       return null;
     }
 
-    // Wire Enter on barcode input to populate form
+    // Shared helper to load item by barcode and fill inputs
+    async function loadItemDetailsFromCode(code) {
+      const normalized = String(code || "").trim();
+      if (!normalized) return false;
+      const item = await findItemByCode(normalized);
+      if (!item) {
+        alert(`No item found for code "${normalized}"`);
+        return false;
+      }
+      document.getElementById("forpurchesingitemid").value = item.id || "";
+      document.getElementById("forpurchesingitemname").value = item.name || "";
+      document.getElementById("forpurchesingitemqntload").value = "1";
+      document.getElementById("forpurchesingitempriceload").value = Number(item.price || 0);
+      if (typeof item.discountPrice === "number" && !Number.isNaN(item.discountPrice)) {
+        document.getElementById("forpurchesingitemdiscount").value = item.discountPrice;
+      } else {
+        document.getElementById("forpurchesingitemdiscount").value = "";
+      }
+      document.getElementById("forpurchesingitemqntload").focus();
+      return true;
+    }
+
+    // Expose for non-module scripts (scanner callback)
+    window.loadItemDetailsFromCode = loadItemDetailsFromCode;
+
+    // Wire Enter on barcode input to populate form (uses shared helper)
     const barcodeInput = document.getElementById("Enterbarcodetoloaditemdetails");
     if (barcodeInput) {
       barcodeInput.addEventListener("keydown", async (e) => {
@@ -301,23 +350,10 @@
           e.preventDefault();
           const code = barcodeInput.value.trim();
           if (!code) return;
-          const item = await findItemByCode(code);
-          if (!item) {
-            alert(`No item found for code "${code}"`);
-            return;
+          const filled = await loadItemDetailsFromCode(code);
+          if (filled) {
+            barcodeInput.value = "";
           }
-          document.getElementById("forpurchesingitemid").value = item.id || "";
-          document.getElementById("forpurchesingitemname").value = item.name || "";
-          document.getElementById("forpurchesingitemqntload").value = "1";
-          document.getElementById("forpurchesingitempriceload").value = Number(item.price || 0);
-          if (typeof item.discountPrice === "number" && !Number.isNaN(item.discountPrice)) {
-            document.getElementById("forpurchesingitemdiscount").value = item.discountPrice;
-          } else {
-            document.getElementById("forpurchesingitemdiscount").value = "";
-          }
-          // Clear and focus next field
-          barcodeInput.value = "";
-          document.getElementById("forpurchesingitemqntload").focus();
         }
       });
     }
@@ -488,5 +524,45 @@
 
 
     <script src="./js/capacitor-welcome.js" type="module"></script>
+    <script src="./js/navbar.js"></script>
+
+    <script>
+      function onScanSuccess(decodedText) {
+        const input = document.getElementById('Enterbarcodetoloaditemdetails');
+        if (input) input.value = decodedText;
+        if (window.loadItemDetailsFromCode) {
+          window.loadItemDetailsFromCode(decodedText).then((filled) => {
+            if (filled && input) input.value = "";
+          });
+        }
+      }
+  
+      function onScanError(errorMessage) {
+        // Optionally log errors here
+      }
+  
+      // Barcode formats to support
+      const formatsToSupport = [
+        Html5QrcodeSupportedFormats.CODE_128,
+        Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E
+      ];
+  
+      const html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader",
+        {
+          fps: 10,
+          qrbox: 250,
+          supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
+          formatsToSupport: formatsToSupport
+        },
+        /* verbose= */ false
+      );
+  
+      html5QrcodeScanner.render(onScanSuccess, onScanError);
+    </script>
   </body>
 </html>
