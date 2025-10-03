@@ -8,7 +8,7 @@
 </head>
 <body>
     <main>
-        <section>
+        <section style="display: none;">
             <h2>Create Category</h2>
             <form id="category-form">
                 <label for="category-name">Category Name</label>
@@ -17,9 +17,7 @@
             </form>
         </section>
 
-        <hr>
-
-        <section>
+        <section style="display: block;">
             <h2>Create Item</h2>
             <form id="item-form">
                 <label for="item-name">Item Name</label>
@@ -91,11 +89,11 @@
         <button type="submit">Save</button>
       </form>
     
-      <script type="module">
-        import { db } from "./js/firebase_config.js";
-        import { doc, getDoc, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+    <script type="module">
+        import { rtdb } from "./js/firebase_config.js";
+        import { ref, get } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
         
-        const itemsCollection = collection(db, "items");
+        const rtdbItemsRef = ref(rtdb, 'items');
         const form = document.getElementById("for-load-pruchising-item-modify");
         const cartList = document.getElementById("cartList");
         const grandTotalCell = document.getElementById("grandTotal");
@@ -115,23 +113,26 @@
           try {
             if (statusEl) statusEl.textContent = "Cache: Loading...";
             
-            const itemsQuery = query(itemsCollection, orderBy("name"));
-            const snapshot = await getDocs(itemsQuery);
+            const snap = await get(rtdbItemsRef);
             cachedItemsForStock.clear();
-            
             const itemsData = [];
-            snapshot.docs.forEach(doc => {
-              const data = doc.data();
-              const itemData = {
-                id: doc.id,
-                name: data.name || '',
-                stock: Number(data.stock || 0),
-                price: Number(data.price || 0),
-                discountPrice: data.discountPrice ? Number(data.discountPrice) : null
-              };
-              cachedItemsForStock.set(doc.id, itemData);
-              itemsData.push(itemData);
-            });
+            if (snap.exists()) {
+              const val = snap.val() || {};
+              Object.keys(val).forEach((key) => {
+                const data = val[key] || {};
+                const itemData = {
+                  id: key,
+                  name: data.name || '',
+                  stock: Number(data.stock || 0),
+                  price: Number(data.price || 0),
+                  discountPrice: data.discountPrice ? Number(data.discountPrice) : null
+                };
+                cachedItemsForStock.set(key, itemData);
+                itemsData.push(itemData);
+              });
+              // sort by name for consistency
+              itemsData.sort((a,b) => String(a.name||'').localeCompare(String(b.name||'')));
+            }
             
             // Save to localStorage for offline access
             localStorage.setItem('itemsCache', JSON.stringify(itemsData));

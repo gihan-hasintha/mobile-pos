@@ -9,23 +9,27 @@ import {
   serverTimestamp,
   doc,
   getDoc,
-  runTransaction,
-  increment,
-  setDoc
+  runTransaction as runFsTransaction,
+  increment
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import {
   ref,
-  push
+  push,
+  get,
+  set,
+  update,
+  child,
+  runTransaction
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
 
 const categoriesCollection = collection(db, "categories");
 const itemsCollection = collection(db, "items");
-const billsCollection = collection(db, "bills"); // Keep for reference, but we'll use RTDB for new bills
+const billsCollection = collection(db, "bills"); // Legacy (reading only if ever needed)
 const customersCollection = collection(db, "customer");
-const countersCollection = collection(db, "counters");
 
 // Realtime Database references
 const rtdbBillsRef = ref(rtdb, 'bills');
+const rtdbItemsRef = ref(rtdb, 'items');
 
 let cachedCategories = [];
 let cachedItems = [];
@@ -55,10 +59,27 @@ async function loadCategoriesIntoSelect(selectElement) {
 }
 
 async function loadItems() {
-  const itemsQuery = query(itemsCollection, orderBy("name"));
-  const snapshot = await getDocs(itemsQuery);
-  cachedItems = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-  renderItemsGrid();
+  try {
+    const snap = await get(rtdbItemsRef);
+    if (!snap.exists()) {
+      cachedItems = [];
+      renderItemsGrid();
+      return;
+    }
+    const items = [];
+    snap.forEach((childSnap) => {
+      const data = childSnap.val();
+      items.push({ id: childSnap.key, ...data });
+    });
+    // Sort by name client-side
+    items.sort((a, b) => String(a.name||'').localeCompare(String(b.name||'')));
+    cachedItems = items;
+    renderItemsGrid();
+  } catch (err) {
+    console.error('Failed to load items from RTDB:', err);
+    cachedItems = [];
+    renderItemsGrid();
+  }
 }
 
 function renderCategoryButtons() {
@@ -254,7 +275,8 @@ async function handleCreateItem(event) {
   if (buyingPrice !== null) item.buyingPrice = buyingPrice;
   if (discountPrice !== null) item.discountPrice = discountPrice;
 
-  await addDoc(itemsCollection, item);
+  // Save item to Realtime Database
+  await push(rtdbItemsRef, item);
   const itemForm = document.getElementById("item-form");
   if (itemForm && typeof itemForm.reset === "function") itemForm.reset();
   alert("Item created");
@@ -262,43 +284,15 @@ async function handleCreateItem(event) {
   await loadItems();
 }
 
-// Function to generate bill number with sequential counter
+// Function to generate bill number without storing counters in DB
 async function generateBillNumber() {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
-  
   const datePrefix = `${year}${month}${day}`;
-  
-  // Get or create counter for today
-  const counterDocId = `bill_counter_${datePrefix}`;
-  const counterRef = doc(countersCollection, counterDocId);
-  
-  try {
-    const result = await runTransaction(db, async (transaction) => {
-      const counterSnap = await transaction.get(counterRef);
-      
-      let currentCount = 1;
-      if (counterSnap.exists()) {
-        currentCount = (counterSnap.data().count || 0) + 1;
-        transaction.update(counterRef, { count: currentCount });
-      } else {
-        transaction.set(counterRef, { count: currentCount, date: datePrefix });
-      }
-      
-      // Format counter with leading zeros (3 digits)
-      const formattedCounter = String(currentCount).padStart(3, '0');
-      return `${datePrefix}${formattedCounter}`;
-    });
-    
-    return result;
-  } catch (error) {
-    console.error('Error generating bill number:', error);
-    // Fallback to timestamp-based if counter fails
-    const timestamp = Date.now().toString().slice(-6);
-    return `${datePrefix}${timestamp}`;
-  }
+  const timestamp = Date.now().toString().slice(-6);
+  return `${datePrefix}${timestamp}`;
 }
 
 async function handleCompleteBill() {
@@ -356,37 +350,34 @@ async function handleCompleteBill() {
   };
 
   try {
-    // First, validate stock and then decrement stock atomically per item using a Firestore transaction
-    // Then save bill to Realtime Database for speed
-    const result = await runTransaction(db, async (transaction) => {
-      // Validate available stock first (aggregated per item)
-      for (const [itemId, qty] of Object.entries(quantityByItemId)) {
-        const itemRef = doc(itemsCollection, itemId);
-        const itemSnap = await transaction.get(itemRef);
-        if (!itemSnap.exists()) {
-          throw new Error(`Item not found: ${itemId}`);
+    // For each item, atomically check and decrement stock using RTDB transaction
+    for (const [itemId, qty] of Object.entries(quantityByItemId)) {
+      const stockRef = child(rtdbItemsRef, `${itemId}/stock`);
+      await runTransaction(stockRef, (currentStock) => {
+        const stockNum = Number(currentStock || 0);
+        const decrementBy = Number(qty || 0);
+        if (Number.isNaN(stockNum) || stockNum < decrementBy) {
+          // Abort transaction by returning; we'll throw later
+          return currentStock;
         }
-        const data = itemSnap.data();
-        const currentStock = Number(data.stock || 0);
-        if (qty > currentStock) {
-          const name = data.name || itemId;
-          throw new Error(`Insufficient stock for ${name}. In stock: ${currentStock}, requested: ${qty}`);
+        return stockNum - decrementBy;
+      }, { applyLocally: false }).then((res) => {
+        const stockNum = Number(res.snapshot.val());
+        if (Number.isNaN(stockNum)) {
+          throw new Error('Stock update failed');
         }
+      });
+      // After transaction, verify not negative
+      const postSnap = await get(child(rtdbItemsRef, `${itemId}/stock`));
+      const postStock = Number(postSnap.val() || 0);
+      if (postStock < 0) {
+        throw new Error(`Insufficient stock for ${itemId}`);
       }
+    }
 
-      // Decrement stock atomically per item using increment()
-      for (const [itemId, qty] of Object.entries(quantityByItemId)) {
-        const itemRef = doc(itemsCollection, itemId);
-        transaction.update(itemRef, { stock: increment(-Number(qty || 0)) });
-      }
-
-      // Return bill number for later use
-      return { billNumber };
-    });
-
-    // Save bill to Realtime Database for faster access
+    // Save bill to Realtime Database
     const billRef = await push(rtdbBillsRef, bill);
-    const finalResult = { billId: billRef.key, billNumber: result.billNumber };
+    const finalResult = { billId: billRef.key, billNumber };
 
     alert(`Bill #${finalResult.billNumber} saved and stock updated.`);
 
