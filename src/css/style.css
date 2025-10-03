@@ -154,6 +154,7 @@ button { padding: 6px 12px; cursor: pointer; }
   gap: 4px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: 0px;
   scrollbar-width: thin;
 }
 .category-bar::-webkit-scrollbar { height: 0px; }
