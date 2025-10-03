@@ -49,6 +49,20 @@ body {
   width: 22px;
 }
 
+.navbar-app-LOGO-img img {
+  width: 88px;
+}
+
+.navigation-bar-for-application-head-content-right-c {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navigation-bar-for-application-head-content-right-c img {
+  width: 22px;
+}
+
 
 
 
