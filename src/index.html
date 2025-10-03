@@ -50,7 +50,8 @@
           </form>
       </section>
 
-      <section style="display: block;">
+      <div id="asdas-asdas-dasd-create-item-section" style="display: none;">
+        <section>
           <h2>Create Item</h2>
           <form id="item-form">
               <label for="item-name">Item Name</label>
@@ -77,6 +78,7 @@
               <button type="submit">Add Item</button>
           </form>
       </section>
+      </div>
 
       <hr>
 
@@ -92,6 +94,7 @@
   </main>
 
   <div id="listf-or-cart-and-another-functions">
+    <input type="text" id="Enterbarcodetoloaditemdetails" placeholder="Enter barcode to load item details">
     <form id="for-load-pruchising-item-modify">
       <input type="text" id="forpurchesingitemid" placeholder="Item ID" required>
       <input type="text" id="forpurchesingitemname" placeholder="Item Name" required>
@@ -160,7 +163,8 @@
               name: data.name || '',
               stock: Number(data.stock || 0),
               price: Number(data.price || 0),
-              discountPrice: data.discountPrice ? Number(data.discountPrice) : null
+              discountPrice: data.discountPrice ? Number(data.discountPrice) : null,
+              code: data.code || ''
             };
             cachedItemsForStock.set(key, itemData);
             itemsData.push(itemData);
@@ -271,6 +275,50 @@
         await loadItemsCache();
         refreshBtn.disabled = false;
         refreshBtn.textContent = "Refresh Stock Data";
+      });
+    }
+
+    // Helper: find item by code (barcode)
+    async function findItemByCode(code) {
+      const normalized = String(code || "").trim();
+      if (!normalized) return null;
+      if (cachedItemsForStock.size === 0 || isCacheExpired()) {
+        await loadItemsCache();
+      }
+      for (const item of cachedItemsForStock.values()) {
+        if (String(item.code || "").trim() === normalized) {
+          return item;
+        }
+      }
+      return null;
+    }
+
+    // Wire Enter on barcode input to populate form
+    const barcodeInput = document.getElementById("Enterbarcodetoloaditemdetails");
+    if (barcodeInput) {
+      barcodeInput.addEventListener("keydown", async (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const code = barcodeInput.value.trim();
+          if (!code) return;
+          const item = await findItemByCode(code);
+          if (!item) {
+            alert(`No item found for code "${code}"`);
+            return;
+          }
+          document.getElementById("forpurchesingitemid").value = item.id || "";
+          document.getElementById("forpurchesingitemname").value = item.name || "";
+          document.getElementById("forpurchesingitemqntload").value = "1";
+          document.getElementById("forpurchesingitempriceload").value = Number(item.price || 0);
+          if (typeof item.discountPrice === "number" && !Number.isNaN(item.discountPrice)) {
+            document.getElementById("forpurchesingitemdiscount").value = item.discountPrice;
+          } else {
+            document.getElementById("forpurchesingitemdiscount").value = "";
+          }
+          // Clear and focus next field
+          barcodeInput.value = "";
+          document.getElementById("forpurchesingitemqntload").focus();
+        }
       });
     }
 

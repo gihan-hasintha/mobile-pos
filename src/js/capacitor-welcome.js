@@ -150,21 +150,86 @@ window.customElements.define(
             lines.push(`[C]Date: ${nowStr}`);
             lines.push('');
             lines.push('[L]--------------------------------');
-            if (qrPayload) {
-              lines.push('[C]<font size="medium"><b>Scan QR</b></font>');
-              lines.push(`[C]<qrcode>${qrPayload}</qrcode>`);
-              lines.push('');
-            } else {
-              lines.push('[C]QR not available');
-            }
-            lines.push('[L]--------------------------------');
-            if (vehicleLine) {
-              lines.push(`[L]${vehicleLine}`);
+
+            // Cart items section (from current page cart cards)
+            try {
+              const cartList = document.querySelector('#cartList');
+              const cards = cartList ? Array.from(cartList.querySelectorAll('.cart-card')) : [];
+              if (cards.length > 0) {
+                // Helpers to format fixed-width columns for thermal printers
+                const padRight = (str, len) => {
+                  const s = String(str ?? '');
+                  return s.length >= len ? s.slice(0, len) : (s + ' '.repeat(len - s.length));
+                };
+                const padLeft = (str, len) => {
+                  const s = String(str ?? '');
+                  return s.length >= len ? s.slice(-len) : (' '.repeat(len - s.length) + s);
+                };
+
+                // Column widths tuned for 32-42 char printers
+                const COL_PRICE = 10;     // Price
+                const COL_DIS = 10;       // Dis Price (Our Price)
+                const COL_QTY = 5;        // Qty (e.g., x1)
+                const COL_TOTAL = 12;     // Total
+
+                const makeDetailsRow = (price, disPrice, qty, total) => {
+                  return (
+                    '[L]'
+                    + padLeft(price, COL_PRICE)
+                    + padLeft(disPrice, COL_DIS)
+                    + padLeft(qty, COL_QTY)
+                    + padLeft(total, COL_TOTAL)
+                  );
+                };
+
+                lines.push("[C]<font size='medium'><b>Items</b></font>");
+                lines.push('[L]--------------------------------');
+                // Header for details row
+                lines.push(makeDetailsRow('Price', 'Our Price', 'Qty', 'Total'));
+                lines.push('[L]--------------------------------');
+                // Rows (two-line per item: name on top, details below)
+                cards.forEach((card) => {
+                  const name = (card.dataset.itemName || '').toString();
+                  const qtyNum = Number(card.dataset.quantity || '0');
+                  const priceNum = Number(card.dataset.price || '0');
+                  const disPriceNum = Number(card.dataset.salePrice || card.dataset.price || '0');
+                  const totalNum = Number(card.dataset.total || String(qtyNum * disPriceNum));
+                  lines.push('[L]<b>' + name + '</b>');
+                  lines.push(makeDetailsRow(
+                    priceNum.toFixed(2),
+                    disPriceNum.toFixed(2),
+                    'x' + String(qtyNum),
+                    totalNum.toFixed(2)
+                  ));
+                  lines.push('');
+                });
+                lines.push('[L]--------------------------------');
+
+                const grandTotalEl = document.querySelector('#grandTotal');
+                const itemCountEl = document.querySelector('#itemCount');
+                const customerAmountEl = document.querySelector('#customerAmount');
+                const balanceEl = document.querySelector('#balance');
+
+                const grandTotal = grandTotalEl ? Number((grandTotalEl.textContent || '0').trim()) : 0;
+                const itemCount = itemCountEl ? Number((itemCountEl.textContent || '0').trim()) : 0;
+                const customerAmount = customerAmountEl ? Number(customerAmountEl.value || '0') : 0;
+                const balance = balanceEl ? Number((balanceEl.textContent || '0').trim()) : (grandTotal - customerAmount);
+
+                lines.push(`[R]Items count: ${itemCount}`);
+                lines.push(`[R]<font size='medium'><b>Grand Total: ${grandTotal.toFixed(2)}</b></font>`);
+                if (!Number.isNaN(customerAmount) && customerAmount > 0) {
+                  lines.push(`[R]Balance: ${balance.toFixed(2)}`);
+                }
+                lines.push('');
+              }
+            } catch (e) {
+              // If DOM not available, skip items
             }
             lines.push('[C]--------------------------------');
             lines.push("[C]<font size='medium'><b>Thank you!</b></font>");
             lines.push("[C]<font size='medium'><b>System by ImaPOS</b></font>");
-            lines.push('');
+            lines.push('\n');
+            lines.push('\n');
 
             const text = lines.join('\n');
 
