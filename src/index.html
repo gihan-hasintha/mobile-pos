@@ -23,11 +23,12 @@
     <link rel="manifest" href="./manifest.json" />
     <link rel="stylesheet" href="./css/style.css" />
     <meta name="theme-color" content="#31d53d" />
+    <script src="https://unpkg.com/html5-qrcode"></script>
   </head>
   <body>
     <capacitor-welcome></capacitor-welcome>
 
-    <section style="padding: 15px;">
+    <section style="padding: 15px;display: none;">
       <h2>USB Thermal Printer (Page)</h2>
       <p>
         <button id="list-usb-page">List USB Printers</button>
@@ -39,6 +40,38 @@
       </div>
       <p id="printer-status-page"></p>
     </section>
+
+    <div id="navigation-bar-for-application-head">
+      <div class="navigation-bar-for-application-head-navbar">
+        <div class="navigation-bar-for-application-head-content">
+          <div class="navigation-bar-for-application-head-content-left" onclick="showcartlistoncashieraddedtocart()">
+            <div class="navigation-bar-for-application-head-content-left-btn-for-show-shopping-cart">
+              <div class="navigation-bar-for-application-head-content-left-btn-for-show-shopping-cart-img">
+                <img src="./assets/imgs/shopping_bag_speed_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+              </div>
+              <div class="navigation-bar-for-application-head-content-left-btn-for-show-shopping-cart-text-for-show-results" id="navigation-bar-for-application-head-content-left-btn-for-show-shopping-cart-text-for-show-results-txt">0</div>
+            </div>
+          </div>
+          <div class="navigation-bar-for-application-head-content-center">
+            <div class="navbar-app-LOGO-img">
+              <img src="./assets/imgs/IMAPOS_LOGO.png" alt="">
+            </div>
+          </div>
+          <div class="navigation-bar-for-application-head-content-right">
+            <div class="navigation-bar-for-application-head-content-right-c">
+              <div class="navigation-bar-for-application-head-content-right-button">
+                <img src="./assets/imgs/search-interface-symbol.png" alt="">
+              </div>
+              <div class="navigation-bar-for-application-head-content-right-button">
+                <img src="./assets/imgs/menu_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="navigation-bar-for-application-head-navbar-space"></div>
+    </div>
 
     <main>
       <section style="display: none;">
@@ -80,32 +113,73 @@
       </section>
       </div>
 
-      <hr>
-
       <section>
-          <h2>Browse Items</h2>
-          <div style="margin-bottom: 10px;">
-              <span id="cache-status" style="font-size: 12px; color: #666;">Cache: Loading...</span>
-              <button id="refresh-cache-btn" style="margin-left: 10px; font-size: 12px; padding: 2px 8px;">Refresh Stock Data</button>
-          </div>
+        <div class="category-buttons-content">
           <div id="category-buttons"></div>
+        </div>
           <div id="items-grid"></div>
       </section>
   </main>
 
-  <div id="listf-or-cart-and-another-functions">
-    <input type="text" id="Enterbarcodetoloaditemdetails" placeholder="Enter barcode to load item details">
-    <form id="for-load-pruchising-item-modify">
-      <input type="text" id="forpurchesingitemid" placeholder="Item ID" required>
-      <input type="text" id="forpurchesingitemname" placeholder="Item Name" required>
-      <input type="number" id="forpurchesingitemqntload" placeholder="Item QNT" required>
-      <input type="number" id="forpurchesingitempriceload" placeholder="Original Price" required>
-      <!-- This field is the discounted / selling price per item (if provided it will override Original Price) -->
-      <input type="number" id="forpurchesingitemdiscount" placeholder="Discounted Price (per item, overrides Price)">
-      <button type="submit">Done</button>
-    </form>
+  <div class="show-bill-confirmation-window-on-main-application">
+    <div class="show-bill-confirmation-window-on-main-application-sada">
+      <div class="show-bill-confirmation-window-on-main-application-content-results" style="margin-bottom: 4px;">
+        <div class="show-bill-confirmation-window-on-main-application-content-results-title">Grand Total</div>
+        <div id="grand-total-showing-for-main-home" class="grand-total-showing-for-main-home-content">0.00</div>
+      </div>
   
-    <div id="cartList" class="cart-list"></div>
+      <div class="show-bill-confirmation-window-on-main-application-content-results">
+      <div class="show-bill-confirmation-window-on-main-application-content-results-title">Item Count</div>
+      <div id="grand-item-count-showing-for-main-home" class="grand-total-showing-for-main-home-content">0</div>
+      </div>
+
+      <div class="show-bill-confirmation-window-on-main-application-content-results-button">
+        <button class="show-bill-confirmation-window-on-main-application-content-results-button-can">Cancel</button>
+        <button class="show-bill-confirmation-window-on-main-application-content-results-button-con">Confirm</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="listf-or-cart-and-another-functions">
+    
+    <div id="barcode-scanner"></div>
+
+    <input type="text" id="Enterbarcodetoloaditemdetails" placeholder="Enter barcode to load item details">
+    <button id="finditempressEnterBtn" onclick="findEnterbarcodetoloaditemdetailscodefinding()">Find</button>
+    
+    <div id="window-for-show-billing-form-page" style="display: none;">
+      <div class="window-for-show-billing-form-page-content">
+        <div class="window-for-show-billing-form-page-content-form">
+          <form id="for-load-pruchising-item-modify">
+            <input type="text" id="forpurchesingitemid" placeholder="Item ID" required>
+            <input type="text" id="forpurchesingitemname" placeholder="Item Name" required>
+            <div class="window-for-show-billing-form-page-content-form-double-w-inpt">
+              <input type="number" id="forpurchesingitemqntload" placeholder="Item QNT" required>
+              <button type="button" id="decreaseBtn">−</button>
+              <button type="button" id="increaseBtn">+</button>
+            </div>
+            <input type="number" id="forpurchesingitempriceload" placeholder="Original Price" required>
+            <!-- This field is the discounted / selling price per item (if provided it will override Original Price) -->
+            <input type="number" id="forpurchesingitemdiscount" placeholder="Discounted Price (per item, overrides Price)">
+            <div class="window-for-show-billing-form-page-content-form-double-w-inpt-final-stage">
+              <button type="reset" class="window-for-show-billing-form-page-content-form-double-w-inpt-final-stage-cancelbt" id="window-for-show-billing-form-page-content-form-double-w-inpt-final-stage-cancelbt-sd" onclick="hidewindowforshowbillingformpage()">Cancel</button>
+              <button type="submit" class="window-for-show-billing-form-page-content-form-double-w-inpt-final-stage-done-bt">Done</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="window-for-show-cart-list-page" style="display: none;">
+      <div class="window-for-show-cart-list-page-content">
+        <div class="window-for-show-cart-list-page-content-c">
+          <div id="cartList" class="cart-list"></div>
+          <div class="window-for-show-cart-list-page-content-c-space"></div>
+        </div>
+      </div>
+    </div>
+
   
     <div id="summaryBox">
       <div>Grand Total: <span id="grandTotal">0.00</span></div>
@@ -263,20 +337,11 @@
     window.updateCachedStock = updateCachedStock;
     window.loadItemsCache = loadItemsCache;
 
-    // Initialize cache when page loads
+    // Initialize cache when page loads and auto-refresh in background
     loadItemsCache();
-
-    // Setup refresh button
-    const refreshBtn = document.getElementById("refresh-cache-btn");
-    if (refreshBtn) {
-      refreshBtn.addEventListener("click", async () => {
-        refreshBtn.disabled = true;
-        refreshBtn.textContent = "Refreshing...";
-        await loadItemsCache();
-        refreshBtn.disabled = false;
-        refreshBtn.textContent = "Refresh Stock Data";
-      });
-    }
+    setInterval(() => {
+      loadItemsCache();
+    }, CACHE_DURATION);
 
     // Helper: find item by code (barcode)
     async function findItemByCode(code) {
@@ -293,7 +358,33 @@
       return null;
     }
 
-    // Wire Enter on barcode input to populate form
+    // Shared helper to load item by barcode and fill inputs
+    async function loadItemDetailsFromCode(code) {
+      const normalized = String(code || "").trim();
+      if (!normalized) return false;
+      const item = await findItemByCode(normalized);
+      if (!item) {
+        alert(`No item found for code "${normalized}"`);
+        document.getElementById("window-for-show-billing-form-page").style.display = "none";
+        return false;
+      }
+      document.getElementById("forpurchesingitemid").value = item.id || "";
+      document.getElementById("forpurchesingitemname").value = item.name || "";
+      document.getElementById("forpurchesingitemqntload").value = "1";
+      document.getElementById("forpurchesingitempriceload").value = Number(item.price || 0);
+      if (typeof item.discountPrice === "number" && !Number.isNaN(item.discountPrice)) {
+        document.getElementById("forpurchesingitemdiscount").value = item.discountPrice;
+      } else {
+        document.getElementById("forpurchesingitemdiscount").value = "";
+      }
+      document.getElementById("forpurchesingitemqntload").focus();
+      return true;
+    }
+
+    // Expose for non-module scripts (scanner callback)
+    window.loadItemDetailsFromCode = loadItemDetailsFromCode;
+
+    // Wire Enter on barcode input to populate form (uses shared helper)
     const barcodeInput = document.getElementById("Enterbarcodetoloaditemdetails");
     if (barcodeInput) {
       barcodeInput.addEventListener("keydown", async (e) => {
@@ -301,23 +392,10 @@
           e.preventDefault();
           const code = barcodeInput.value.trim();
           if (!code) return;
-          const item = await findItemByCode(code);
-          if (!item) {
-            alert(`No item found for code "${code}"`);
-            return;
+          const filled = await loadItemDetailsFromCode(code);
+          if (filled) {
+            barcodeInput.value = "";
           }
-          document.getElementById("forpurchesingitemid").value = item.id || "";
-          document.getElementById("forpurchesingitemname").value = item.name || "";
-          document.getElementById("forpurchesingitemqntload").value = "1";
-          document.getElementById("forpurchesingitempriceload").value = Number(item.price || 0);
-          if (typeof item.discountPrice === "number" && !Number.isNaN(item.discountPrice)) {
-            document.getElementById("forpurchesingitemdiscount").value = item.discountPrice;
-          } else {
-            document.getElementById("forpurchesingitemdiscount").value = "";
-          }
-          // Clear and focus next field
-          barcodeInput.value = "";
-          document.getElementById("forpurchesingitemqntload").focus();
         }
       });
     }
@@ -327,6 +405,8 @@
 
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
+      document.getElementById("window-for-show-billing-form-page").style.display = "none";
+      document.getElementById("window-for-show-billing-form-page-content-form-double-w-inpt-final-stage-cancelbt-sd").style.display = "block";
 
       const itemId = document.getElementById("forpurchesingitemid").value.trim();
       const itemName = document.getElementById("forpurchesingitemname").value.trim();
@@ -437,6 +517,8 @@
 
       if (target.classList.contains("edit-btn")) {
         // Prefill the input form with existing values and remove the card
+        document.getElementById("window-for-show-billing-form-page").style.display = "block";
+        document.getElementById("window-for-show-billing-form-page-content-form-double-w-inpt-final-stage-cancelbt-sd").style.display = "none";
         document.getElementById("forpurchesingitemid").value = card.dataset.itemId || "";
         document.getElementById("forpurchesingitemname").value = card.dataset.itemName || "";
         document.getElementById("forpurchesingitemqntload").value = card.dataset.quantity || "1";
@@ -470,6 +552,9 @@
     function updateSummary() {
       grandTotalCell.textContent = grandTotal.toFixed(2);
       itemCountCell.textContent = totalQuantity;
+      document.getElementById("grand-total-showing-for-main-home").textContent = grandTotal.toFixed(2);
+      document.getElementById("grand-item-count-showing-for-main-home").textContent = totalQuantity;
+      document.getElementById("navigation-bar-for-application-head-content-left-btn-for-show-shopping-cart-text-for-show-results-txt").textContent = totalQuantity;
 
       const customerAmount = parseFloat(customerAmountInput.value) || 0;
       const balance = grandTotal - customerAmount;
@@ -488,5 +573,115 @@
 
 
     <script src="./js/capacitor-welcome.js" type="module"></script>
+    <script src="./js/navbar.js"></script>
+
+
+    <h1>Scan Barcode</h1>
+
+    <style>
+      #video {
+        width: 100%;
+        height: 450px;
+        margin-top: 20px;
+        border-radius: 8px;
+        display: none;
+      }
+    
+    </style>
+
+    <button id="startScan">Start Scan</button>
+<video id="video" playsinline></video>
+<input type="text" id="barcodeResult" placeholder="Scanned code will appear here">
+
+<!-- ZXing library -->
+<script src="https://unpkg.com/@zxing/library@latest"></script>
+<script>
+  const startButton = document.getElementById('startScan');
+  const video = document.getElementById('video');
+  const resultInput = document.getElementById('Enterbarcodetoloaditemdetails');
+  const windowforshowbillingformpageforshowingdisplay = document.getElementById('window-for-show-billing-form-page');
+
+  let selectedDeviceId;
+  const codeReader = new ZXing.BrowserMultiFormatReader();
+
+  startButton.addEventListener('click', async () => {
+    // List cameras
+    const devices = await codeReader.listVideoInputDevices();
+    if (devices.length === 0) {
+      alert('No camera found');
+      return;
+    }
+    selectedDeviceId = devices[devices.length - 1].deviceId; // use back camera if available
+
+    video.style.display = 'block';
+    startButton.disabled = true;
+
+    codeReader.decodeOnceFromVideoDevice(selectedDeviceId, video).then(result => {
+      resultInput.value = result.text;
+      codeReader.reset();
+      video.style.display = 'none';
+      startButton.disabled = false;
+      document.getElementById("finditempressEnterBtn").click();
+    }).catch(err => {
+      alert('Error: ' + err);
+      codeReader.reset();
+      video.style.display = 'none';
+      startButton.disabled = false;
+      windowforshowbillingformpageforshowingdisplay.style.display = "none";
+    });
+  });
+
+  function hidewindowforshowbillingformpage() {
+    document.getElementById("window-for-show-billing-form-page").style.display = "none";
+    document.getElementById("window-for-show-billing-form-page-content-form-double-w-inpt-final-stage-cancelbt-sd").style.display = "block";
+  }
+
+  const input = document.getElementById("forpurchesingitemqntload");
+  const increaseBtn = document.getElementById("increaseBtn");
+  const decreaseBtn = document.getElementById("decreaseBtn");
+
+  increaseBtn.addEventListener("click", () => {
+    input.value = parseInt(input.value || 0) + 1;
+  });
+
+  decreaseBtn.addEventListener("click", () => {
+    const currentValue = parseInt(input.value || 0);
+    if (currentValue > 0) {
+      input.value = currentValue - 1;
+    }
+  });
+
+  document.getElementById("finditempressEnterBtn").addEventListener("click", function() {
+  const inputEnterbarcodetoloaditemdetails = document.getElementById("Enterbarcodetoloaditemdetails");
+  document.getElementById("window-for-show-billing-form-page").style.display = "block";
+  document.getElementById("window-for-show-billing-form-page-content-form-double-w-inpt-final-stage-cancelbt-sd").style.display = "block";
+
+  // Create and dispatch an Enter key event
+  const event = new KeyboardEvent("keydown", {
+    key: "Enter",
+    code: "Enter",
+    keyCode: 13,
+    which: 13,
+    bubbles: true
+  });
+
+  inputEnterbarcodetoloaditemdetails.dispatchEvent(event);
+});
+
+document.getElementById("myInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    document.getElementById("window-for-show-billing-form-page").style.display = "block";
+    document.getElementById("window-for-show-billing-form-page-content-form-double-w-inpt-final-stage-cancelbt-sd").style.display = "block";
+  }
+});
+
+function showcartlistoncashieraddedtocart() {
+  const el = document.getElementById("window-for-show-cart-list-page");
+  const isVisible = window.getComputedStyle(el).display !== "none";
+  el.style.display = isVisible ? "none" : "block";
+}
+
+</script>
+ 
   </body>
 </html>

@@ -18,6 +18,7 @@
     "@capacitor/core": "latest",
     "@capacitor/ios": "^7.4.3",
     "@capacitor/splash-screen": "latest",
+    "@capacitor/status-bar": "^7.0.3",
     "bthrust-thermal-printer-cordova-plugin": "^1.0.9"
   },
   "devDependencies": {

@@ -4,10 +4,274 @@ body {
   margin: 0;
 }
 
-.item-card {
-  width: 100%;
-  background-color: #f5da71;
+input,button,select,textarea {
+  box-sizing: border-box;
 }
+
+/* Items grid */
+#items-grid {
+  width: 95%;
+  margin: 10px auto 20px auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.item-card {
+  background: #0b3e6f;
+  color: #fff;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+
+.item-card-title { font-weight: 700; margin-bottom: 6px; }
+.item-card-price { font-weight: 700; color: #ffd166; margin-bottom: 4px; }
+.item-card-sub { font-size: 12px; color: #b8f34f; opacity: .9; }
+.item-card-code { font-size: 12px; opacity: .85; margin-bottom: 6px; }
+
+/* Optional image in card */
+.item-card-media { display: flex; align-items: center; gap: 10px; }
+.item-card-media img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
+
+.navigation-bar-for-application-head-navbar {
+  width: 100%;
+  height: 50px;
+  position: fixed;
+  top: 0;
+  background-color: #002fff;
+  z-index: 999999999;
+  color: white;
+}
+
+.navigation-bar-for-application-head-navbar-space {
+  width: 100%;
+  height: 50px;
+}
+
+.navigation-bar-for-application-head-content {
+  width: 92%;
+  margin: 0 auto;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navigation-bar-for-application-head-content-left-btn-for-show-shopping-cart {
+  width: auto;
+  height: 40px;
+  background-color: #000000;
+  display: flex;
+  padding-left: 15px;
+  padding-right: 15px;
+  border-radius: 40px;
+  color: white;
+  align-items: center;
+  gap: 5px;
+}
+
+.navigation-bar-for-application-head-content-left-btn-for-show-shopping-cart img {
+  width: 22px;
+  margin-top: 3px;
+}
+
+.navbar-app-LOGO-img img {
+  width: 98px;
+}
+
+.navigation-bar-for-application-head-content-right-c {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.navigation-bar-for-application-head-content-right-c img {
+  width: 22px;
+}
+
+.show-bill-confirmation-window-on-main-application {
+  width: 100%;
+  height: 150px;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  background-color: #000000;
+  color: white;
+  position: fixed;
+  bottom: 0;
+  z-index: 9999;
+}
+
+.window-for-show-cart-list-page-content-c-space {
+  width: 100%;
+  height: 160px;
+}
+
+#window-for-show-billing-form-page-content-form-double-w-inpt-final-stage-cancelbt-sd {
+  display: block;
+}
+
+.show-bill-confirmation-window-on-main-application-content-results {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  text-transform: uppercase;
+}
+
+.show-bill-confirmation-window-on-main-application-sada {
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 20px;
+}
+
+.grand-total-showing-for-main-home-content {
+  color: #E3FF11;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.show-bill-confirmation-window-on-main-application-content-results-title {
+  font-size: 14px;
+}
+
+.show-bill-confirmation-window-on-main-application-content-results-button {
+  display: flex;
+  width: 100%;
+  gap: 10px;
+}
+
+.show-bill-confirmation-window-on-main-application-content-results-button button {
+  width: 100%;
+  height: 45px;
+  margin-top: 10px;
+  color: white;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  text-transform: uppercase;
+  border-radius: 5px;
+}
+
+.show-bill-confirmation-window-on-main-application-content-results-button-can {
+  background-color: #FF3232;
+}
+
+.show-bill-confirmation-window-on-main-application-content-results-button-con {
+  background-color: #00BE33;
+}
+
+.window-for-show-billing-form-page-content {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  display: flex;
+  z-index: 999;
+  align-items: center;
+  justify-content: center;
+  background-color: #000000f4;
+}
+
+.window-for-show-billing-form-page-content-form {
+  width: 80%;
+  background-color: #191818;
+  color: white;
+  padding: 20px;
+  border-radius: 4px;
+}
+
+.window-for-show-billing-form-page-content-form input,button {
+  display: block;
+  width: 100%;
+  outline: none;
+  border: none;
+  background-color: #262626;
+  color: white;
+  border-radius: 4px;
+  height: 45px;
+}
+
+.window-for-show-billing-form-page-content-form button {
+  display: block;
+  height: 45px;
+  background-color: #e77103;
+  font-size: 13px;
+  color: white;
+  width: 100%;
+}
+
+.window-for-show-billing-form-page-content-form-double-w-inpt {
+  display: flex;
+  margin-bottom: 7px;
+  align-items: center;
+  gap: 7px;
+}
+
+.window-for-show-billing-form-page-content-form-double-w-inpt button {
+  width: 25%;
+  height: 45px;
+  background-color: #059d65;
+  font-size: 25px;
+}
+
+#for-load-pruchising-item-modify input {
+  margin-bottom: 7px;
+  padding-left: 15px;
+}
+
+.window-for-show-billing-form-page-content-form-double-w-inpt input {
+  margin-bottom: 0px !important;
+}
+
+.window-for-show-billing-form-page-content-form-double-w-inpt-final-stage {
+  display: flex;
+  gap: 7px;
+}
+
+.window-for-show-billing-form-page-content-form-double-w-inpt-final-stage button {
+  height: 50px;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.window-for-show-billing-form-page-content-form-double-w-inpt-final-stage .window-for-show-billing-form-page-content-form-double-w-inpt-final-stage-cancelbt {
+  background-color: #ff5805;
+}
+
+.window-for-show-billing-form-page-content-form-double-w-inpt-final-stage .window-for-show-billing-form-page-content-form-double-w-inpt-final-stage-done-bt {
+  background-color: #00BE33;
+}
+
+.item-card-price {
+  padding-top: 9px;
+}
+
+.window-for-show-cart-list-page-content {
+  width: 100%;
+  height: calc(100% - 50px);
+  position: fixed;
+  background-color: #ffffff;
+  overflow: auto;
+  top: 50px;
+  z-index: 99;
+}
+
+.window-for-show-cart-list-page-content-c {
+  width: 100%;
+}
+
+.window-for-show-cart-list-page-content-c {
+  width: 94%;
+  margin: 0 auto;
+}
+
+
+
+
+
+
+
 
 
 
@@ -29,8 +293,6 @@ body {
 
 table { width: 100%; border-collapse: collapse; margin-top: 15px; }
 table, th, td { border: 1px solid black; text-align: center; padding: 6px; }
-input { margin: 5px; padding: 5px; }
-button { padding: 6px 12px; cursor: pointer; }
 .delete-btn { background: red; color: white; border: none; padding: 4px 8px; cursor: pointer; border-radius: 4px; }
 #summaryBox { margin-top: 20px; font-size: 16px; padding: 12px; background: #f9f9f9; border: 1px solid #ccc; border-radius: 6px; max-width: 450px; }
 #summaryBox span { font-weight: bold; }
@@ -73,3 +335,37 @@ button { padding: 6px 12px; cursor: pointer; }
 .expense-sub { font-size: 12px; opacity: .85; margin-bottom: 6px; }
 .expense-time { font-size: 11px; opacity: .75; }
 .expense-notes { margin-top: 6px; font-size: 12px; opacity: .9; }
+
+/* Category horizontal scroll bar */
+#category-buttons { width: 100%; }
+.category-bar {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: 0px;
+  scrollbar-width: thin;
+}
+.category-bar::-webkit-scrollbar { height: 0px; }
+.category-bar::-webkit-scrollbar-thumb { background: #ffffff26; border-radius: 4px; }
+.category-chip {
+  background: #ffffff;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 8px 14px;
+  white-space: nowrap;
+  font-weight: 600;
+  cursor: pointer;
+}
+.category-chip.active {
+  background: #2f6bff;
+  border-color: #2f6bff;
+  color: #ffffff;
+}
+
+.category-buttons-content {
+  width: 95%;
+  padding-top: 10px;
+  margin: 0 auto;
+}

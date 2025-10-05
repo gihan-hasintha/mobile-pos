@@ -86,11 +86,12 @@ function renderCategoryButtons() {
   const container = document.getElementById("category-buttons");
   if (!container) return;
   container.innerHTML = "";
+  container.className = "category-bar";
 
   const allBtn = document.createElement("button");
   allBtn.textContent = "All";
   allBtn.dataset.categoryId = "all";
-  if (activeCategoryId === "all") allBtn.disabled = true;
+  allBtn.className = "category-chip" + (activeCategoryId === "all" ? " active" : "");
   allBtn.addEventListener("click", () => {
     activeCategoryId = "all";
     renderCategoryButtons();
@@ -102,7 +103,7 @@ function renderCategoryButtons() {
     const btn = document.createElement("button");
     btn.textContent = cat.name;
     btn.dataset.categoryId = cat.id;
-    if (activeCategoryId === cat.id) btn.disabled = true;
+    btn.className = "category-chip" + (activeCategoryId === cat.id ? " active" : "");
     btn.addEventListener("click", () => {
       activeCategoryId = cat.id;
       renderCategoryButtons();
@@ -152,25 +153,41 @@ function renderItemsGrid() {
     const card = document.createElement("div");
     card.className = "item-card";
 
-    const title = document.createElement("h3");
-    title.textContent = item.name;
-
-    const code = document.createElement("p");
-    code.textContent = `Code: ${item.code}`;
-
-    const price = document.createElement("p");
-    if (typeof item.discountPrice === "number") {
-      price.innerHTML = `<span style="text-decoration:line-through; opacity:.7;">$${Number(item.price).toFixed(2)}</span> <strong>$${Number(item.discountPrice).toFixed(2)}</strong>`;
-    } else {
-      price.textContent = `$${Number(item.price).toFixed(2)}`;
+    // Optional image support - expects item.imageUrl; if absent, show initials color block
+    const media = document.createElement("div");
+    media.className = "item-card-media";
+    if (item.imageUrl) {
+      const img = document.createElement("img");
+      img.src = item.imageUrl;
+      img.alt = item.name || "";
+      media.appendChild(img);
     }
 
-    const stock = document.createElement("p");
-    stock.textContent = `Stock: ${item.stock}`;
+    const title = document.createElement("div");
+    title.className = "item-card-title";
+    title.textContent = item.name;
 
+    const price = document.createElement("div");
+    price.className = "item-card-price";
+    if (typeof item.discountPrice === "number") {
+      price.innerHTML = `PRICE : <span style=\"text-decoration:line-through; opacity:.7;display: none; color:#ffffffcc\">${Number(item.price).toFixed(2)}</span> <span>${Number(item.discountPrice).toFixed(2)}</span>`;
+    } else {
+      price.innerHTML = `PRICE : <span>${Number(item.price).toFixed(2)}</span>`;
+    }
+
+    const code = document.createElement("div");
+    code.className = "item-card-code";
+    code.textContent = `CODE : ${item.code}`;
+
+    const stock = document.createElement("div");
+    stock.style.display = "none";
+    stock.className = "item-card-sub";
+    stock.textContent = `STOCK : ${item.stock}`;
+
+    if (media.childElementCount) card.appendChild(media);
     card.appendChild(title);
-    card.appendChild(code);
     card.appendChild(price);
+    card.appendChild(code);
     card.appendChild(stock);
 
     const numericStock = Number(item.stock || 0);
@@ -184,7 +201,11 @@ function renderItemsGrid() {
       card.style.pointerEvents = "none"; // disable clicking
       card.title = "Out of stock";
     } else {
-      card.addEventListener("click", () => populatePurchaseForm(item));
+      card.addEventListener("click", () => {
+        populatePurchaseForm(item);
+        const billingWindow = document.getElementById("window-for-show-billing-form-page");
+        if (billingWindow) billingWindow.style.display = "block";
+      });
       card.style.cursor = "pointer";
     }
 

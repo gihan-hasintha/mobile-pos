@@ -37,6 +37,7 @@
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
     
     <!-- Bluetooth permissions for all Android versions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
