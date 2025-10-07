@@ -28,19 +28,6 @@
   <body>
     <capacitor-welcome></capacitor-welcome>
 
-    <section style="padding: 15px;display: none;">
-      <h2>USB Thermal Printer (Page)</h2>
-      <p>
-        <button id="list-usb-page">List USB Printers</button>
-        <button id="print-usb-page">Print Test (USB)</button>
-      </p>
-      <div>
-        <h3>Printers</h3>
-        <ul id="printers-page"></ul>
-      </div>
-      <p id="printer-status-page"></p>
-    </section>
-
     <div id="navigation-bar-for-application-head">
       <div class="navigation-bar-for-application-head-navbar">
         <div class="navigation-bar-for-application-head-content">
@@ -73,53 +60,32 @@
       <div class="navigation-bar-for-application-head-navbar-space"></div>
     </div>
 
-    <main>
-      <section style="display: none;">
-          <h2>Create Category</h2>
-          <form id="category-form">
-              <label for="category-name">Category Name</label>
-              <input type="text" id="category-name" placeholder="e.g. Beverages" required>
-              <button type="submit">Add Category</button>
-          </form>
-      </section>
-
-      <div id="asdas-asdas-dasd-create-item-section" style="display: none;">
-        <section>
-          <h2>Create Item</h2>
-          <form id="item-form">
-              <label for="item-name">Item Name</label>
-              <input type="text" id="item-name" placeholder="e.g. Cola" required>
-
-              <label for="item-code">Item Code</label>
-              <input type="text" id="item-code" placeholder="e.g. SKU-0001" required>
-
-              <label for="item-price">Item Price</label>
-              <input type="number" id="item-price" step="0.01" min="0" placeholder="0.00" required>
-
-              <label for="item-buying-price">Buying Price (optional)</label>
-              <input type="number" id="item-buying-price" step="0.01" min="0" placeholder="0.00">
-
-              <label for="item-discount-price">Discount Price (optional)</label>
-              <input type="number" id="item-discount-price" step="0.01" min="0" placeholder="0.00">
-
-              <label for="item-stock">Item Stock</label>
-              <input type="number" id="item-stock" step="1" min="0" placeholder="0" required>
-
-              <label for="item-category">Category</label>
-              <select id="item-category" required></select>
-
-              <button type="submit">Add Item</button>
-          </form>
-      </section>
-      </div>
-
-      <section>
-        <div class="category-buttons-content">
-          <div id="category-buttons"></div>
+    <section>
+      <div class="home-page-item-grids-and-category-showing-on-page">
+        <div class="home-page-item-grids-and-category-showing-on-page-asdasd-asdkas-asd">
+          <div class="category-buttons-content">
+            <div id="category-buttons"></div>
+          </div>
         </div>
+        <div class="home-page-item-grids-and-category-showing-on-page-asdasd-asdkas-asd-space"></div>
           <div id="items-grid"></div>
-      </section>
-  </main>
+          <div class="home-page-item-grids-and-category-showing-on-page-asdasd-asdkas-asd-space-asdpasdksad"></div>
+      </div>
+    </section>
+
+    <section style="padding: 15px;display: none;">
+      <h2>USB Thermal Printer (Page)</h2>
+      <p>
+        <button id="list-usb-page">List USB Printers</button>
+        <button id="print-usb-page">Print Test (USB)</button>
+      </p>
+      <div>
+        <h3>Printers</h3>
+        <ul id="printers-page"></ul>
+      </div>
+      <p id="printer-status-page"></p>
+    </section>
+
 
   <div class="show-bill-confirmation-window-on-main-application">
     <div class="show-bill-confirmation-window-on-main-application-sada">
@@ -576,6 +542,121 @@
     <script src="./js/navbar.js"></script>
 
 
+    <div id="items-and-categories-creator">
+      <div class="items-and-categories-creator-content">
+        <div class="items-and-categories-creator-content-form"></div>
+      </div>
+    </div>
+
+    <div id="items-and-categories-creataing-window-show-and-hider" style="display: block;">
+      <main>
+        <div class="items-and-categories-creataing-window">
+          <div class="items-and-categories-creataing-window-space-switch-hjh">
+            <label class="switch">
+              <input type="checkbox" id="itemsandcategoriescreataingwindowspaceidcreatecategorytoggleSwitch">
+              <span class="slider"></span>
+            </label>
+            <div class="items-and-categories-creataing-window-space-switch-hjh-txt">Category Manage</div>
+          </div>
+  
+          <div id="items-and-categories-creataing-window-space-id-create-category" class="items-and-categories-creataing-window-space-id-create-category-classforall">
+          <section style="display: block;">
+            <div class="items-and-categories-creataing-window-space-id-create-category-classforall-title">
+              Create Category
+            </div>
+            <form id="category-form" class="items-and-categories-creataing-window-space-id-create-category-form">
+                <label for="category-name">Category Name</label>
+                <input type="text" id="category-name" placeholder="e.g. Beverages" required>
+                <button type="submit">Add Category</button>
+            </form>
+  
+            <div id="show-for-edit-and-delete-added-categories"></div>
+          </section>
+          </div>
+  
+        <div id="items-and-categories-creataing-window-space-id-create-create-item-section" class="items-and-categories-creataing-window-space-id-create-category-classforall" style="display: block;">
+          <section>
+            <div class="items-and-categories-creataing-window-space-id-create-category-classforall-title">
+              add new Item
+            </div>
+            <form id="item-form" class="items-and-categories-creataing-window-space-id-create-category-form">
+                <label for="item-name">Item Name</label>
+                <input type="text" id="item-name" placeholder="e.g. Cola" required>
+  
+                <label for="item-code">Item Code</label>
+                <input type="text" id="item-code" placeholder="e.g. SKU-0001" required>
+  
+                <label for="item-price">Item Price</label>
+                <input type="number" id="item-price" step="100" min="0" placeholder="0.00" required>
+  
+                <label for="item-buying-price">Buying Price (optional)</label>
+                <input type="number" id="item-buying-price" step="100" min="0" placeholder="0.00">
+  
+                <label for="item-discount-price">Discount Price (Selling Price)</label>
+                <input type="number" id="item-discount-price" step="100" min="0" placeholder="0.00" required>
+  
+                <label for="item-stock">Item Stock</label>
+                <input type="number" id="item-stock" step="1" min="0" placeholder="0" required>
+  
+                <label for="item-category">Category</label>
+                <select id="item-category" required></select>
+  
+                <button type="submit">Add Item</button>
+            </form>
+            <script>
+              const itemPrice = document.getElementById("item-price");
+              const discountPrice = document.getElementById("item-discount-price");
+            
+              itemPrice.addEventListener("input", () => {
+                const value = itemPrice.value;
+            
+                // Auto-fill other inputs if empty or not edited
+                if (!discountPrice.dataset.edited) discountPrice.value = value;
+              });
+            
+              // Detect if user manually edits buying or discount price
+              discountPrice.addEventListener("input", () => discountPrice.dataset.edited = true);
+            </script>
+        </section>
+        </div>
+        <div class="items-and-categories-creataing-window-space"></div>
+  
+        </div>
+  
+        <script>
+          const itemsandcategoriescreataingwindowspaceidcreatecategorytoggleSwitch = document.getElementById('itemsandcategoriescreataingwindowspaceidcreatecategorytoggleSwitch');
+          const itemsandcategoriescreataingwindowspaceidcreatecategory = document.getElementById('items-and-categories-creataing-window-space-id-create-category');
+          const itemsandcategoriescreataingwindowspaceidcreateitemforthisapplication = document.getElementById('items-and-categories-creataing-window-space-id-create-create-item-section');
+        
+          // Load saved state from localStorage
+          const savedState = localStorage.getItem('switchState');
+        
+          if (savedState === 'on') {
+            itemsandcategoriescreataingwindowspaceidcreatecategorytoggleSwitch.checked = true;
+            itemsandcategoriescreataingwindowspaceidcreatecategory.style.display = 'block';
+            itemsandcategoriescreataingwindowspaceidcreateitemforthisapplication.style.display = 'none';
+          } else {
+            itemsandcategoriescreataingwindowspaceidcreatecategorytoggleSwitch.checked = false;
+            itemsandcategoriescreataingwindowspaceidcreatecategory.style.display = 'none';
+            itemsandcategoriescreataingwindowspaceidcreateitemforthisapplication.style.display = 'block';
+          }
+        
+          // When switch changes
+          itemsandcategoriescreataingwindowspaceidcreatecategorytoggleSwitch.addEventListener('change', () => {
+            if (itemsandcategoriescreataingwindowspaceidcreatecategorytoggleSwitch.checked) {
+              itemsandcategoriescreataingwindowspaceidcreatecategory.style.display = 'block';
+              itemsandcategoriescreataingwindowspaceidcreateitemforthisapplication.style.display = 'none';
+              localStorage.setItem('switchState', 'on');
+            } else {
+              itemsandcategoriescreataingwindowspaceidcreatecategory.style.display = 'none';
+              itemsandcategoriescreataingwindowspaceidcreateitemforthisapplication.style.display = 'block';
+              localStorage.setItem('switchState', 'off');
+            }
+          });
+        </script>
+    </main>
+    </div>
+
     <h1>Scan Barcode</h1>
 
     <style>
@@ -593,6 +674,12 @@
 <video id="video" playsinline></video>
 <input type="text" id="barcodeResult" placeholder="Scanned code will appear here">
 
+<h1>Scan Barcode</h1>
+<h1>Scan Barcode</h1>
+<h1>Scan Barcode</h1>
+<h1>Scan Barcode</h1>
+<h1>Scan Barcode</h1>
+<h1>Scan Barcode</h1>
 <!-- ZXing library -->
 <script src="https://unpkg.com/@zxing/library@latest"></script>
 <script>

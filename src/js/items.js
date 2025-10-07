@@ -10,7 +10,10 @@ import {
   doc,
   getDoc,
   runTransaction as runFsTransaction,
-  increment
+  increment,
+  updateDoc,
+  setDoc,
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 import {
   ref,
@@ -38,24 +41,37 @@ let activeCategoryId = "all";
 async function loadCategoriesIntoSelect(selectElement) {
   if (!selectElement) return;
   selectElement.innerHTML = "";
+  // show loader in UI areas while categories are loading
+  const btnContainer = document.getElementById("category-buttons");
+  const manageContainer = document.getElementById("show-for-edit-and-delete-added-categories");
+  if (btnContainer) btnContainer.innerHTML = '<div class="spinner"></div>';
+  if (manageContainer) manageContainer.innerHTML = '<div class="spinner"></div>';
   const placeholderOption = document.createElement("option");
   placeholderOption.value = "";
   placeholderOption.textContent = "Select category";
   selectElement.appendChild(placeholderOption);
 
-  const categoriesQuery = query(categoriesCollection, orderBy("name"));
-  const snapshot = await getDocs(categoriesQuery);
-  cachedCategories = [];
-  snapshot.forEach((docSnap) => {
-    const data = { id: docSnap.id, ...docSnap.data() };
-    cachedCategories.push(data);
-    const option = document.createElement("option");
-    option.value = docSnap.id;
-    option.textContent = data.name;
-    selectElement.appendChild(option);
-  });
+  try {
+    const categoriesQuery = query(categoriesCollection, orderBy("name"));
+    const snapshot = await getDocs(categoriesQuery);
+    cachedCategories = [];
+    snapshot.forEach((docSnap) => {
+      const data = { id: docSnap.id, ...docSnap.data() };
+      cachedCategories.push(data);
+      const option = document.createElement("option");
+      option.value = docSnap.id;
+      option.textContent = data.name;
+      selectElement.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Failed to load categories", err);
+    if (btnContainer) btnContainer.innerHTML = "<div style=\"padding:12px;color:#b00020\">Failed to load categories</div>";
+    if (manageContainer) manageContainer.innerHTML = "<div style=\"padding:12px;color:#b00020\">Failed to load categories</div>";
+    return;
+  }
 
   renderCategoryButtons();
+  renderCategoriesManageList();
 }
 
 async function loadItems() {
@@ -111,6 +127,86 @@ function renderCategoryButtons() {
     });
     container.appendChild(btn);
   });
+}
+
+// Render categories with Edit/Delete into the management container
+function renderCategoriesManageList() {
+  const container = document.getElementById("show-for-edit-and-delete-added-categories");
+  if (!container) return;
+  container.innerHTML = "";
+
+  if (!cachedCategories || cachedCategories.length === 0) {
+    const empty = document.createElement("div");
+    empty.textContent = "No categories yet";
+    container.appendChild(empty);
+    return;
+  }
+
+  const list = document.createElement("div");
+  list.className = "category-manage-list";
+
+  cachedCategories.forEach((cat) => {
+    const row = document.createElement("div");
+    row.className = "category-manage-row";
+
+    const nameEl = document.createElement("span");
+    nameEl.className = "category-manage-name";
+    nameEl.textContent = cat.name || "Untitled";
+
+    const actions = document.createElement("div");
+    actions.className = "category-manage-actions";
+
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Edit";
+    editBtn.addEventListener("click", async () => {
+      const newName = prompt("Edit category name", cat.name || "");
+      if (!newName) return;
+      try {
+        await updateCategoryName(cat.id, newName.trim());
+      } catch (e) {
+        console.error(e);
+        alert("Failed to update category");
+      }
+    });
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", async () => {
+      const confirmDel = confirm(`Delete category "${cat.name}"? Items using it will remain with orphaned category.`);
+      if (!confirmDel) return;
+      try {
+        await deleteCategory(cat.id);
+      } catch (e) {
+        console.error(e);
+        alert("Failed to delete category");
+      }
+    });
+
+    actions.appendChild(editBtn);
+    actions.appendChild(deleteBtn);
+
+    row.appendChild(nameEl);
+    row.appendChild(actions);
+    list.appendChild(row);
+  });
+
+  container.appendChild(list);
+}
+
+async function updateCategoryName(categoryId, newName) {
+  if (!categoryId || !newName) return;
+  const categoryDoc = doc(categoriesCollection, categoryId);
+  await updateDoc(categoryDoc, { name: newName });
+  const categorySelect = document.getElementById("item-category");
+  await loadCategoriesIntoSelect(categorySelect);
+}
+
+async function deleteCategory(categoryId) {
+  if (!categoryId) return;
+  const categoryDoc = doc(categoriesCollection, categoryId);
+  await deleteDoc(categoryDoc);
+  const categorySelect = document.getElementById("item-category");
+  await loadCategoriesIntoSelect(categorySelect);
 }
 
 function populatePurchaseForm(item) {
