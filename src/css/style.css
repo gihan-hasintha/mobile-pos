@@ -408,6 +408,28 @@ input:checked + .slider:before {
   margin-bottom: 15px;
 }
 
+.category-manage-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  padding-bottom: 20px;
+}
+
+.category-manage-list {
+  width: 90%;
+  margin: 0 auto;
+}
+
+.application-sideba-for-manage-content {
+  width: 100%;
+  height: calc(100% - 50px);
+  position: fixed;
+  z-index: 9999;
+  overflow: auto;
+  background-color: white;
+  top: 50px;
+}
+
 
 
 
