@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Summary - ImaPOS</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/newstyle.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Sales Summary Specific Styles */
+        .sales-summary-container {
+            width: 100%;
+            height: calc(100% - 50px);
+            position: fixed;
+            top: 50px;
+            overflow: auto;
+            background-color: #f5f5f5;
+        }
+
+        .sales-summary-header {
+            background: linear-gradient(135deg, #002fff 0%, #1e40af 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .sales-summary-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .date-range-selector {
+            background: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .date-range-selector select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+            min-width: 120px;
+        }
+
+        .date-range-selector button {
+            padding: 8px 16px;
+            background: #002fff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .date-range-selector button:hover {
+            background: #1e40af;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .metric-card.gross-sales { border-left-color: #10b981; }
+        .metric-card.discounts { border-left-color: #f59e0b; }
+        .metric-card.net-sales { border-left-color: #3b82f6; }
+        .metric-card.gross-profit { border-left-color: #8b5cf6; }
+        .metric-card.expenses { border-left-color: #ef4444; }
+        .metric-card.net-profit { border-left-color: #06b6d4; }
+        .metric-card.returns { border-left-color: #f97316; }
+
+        .metric-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .metric-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .metric-icon img {
+            filter: brightness(0) invert(1);
+        }
+
+        .metric-icon.gross-sales { background: #10b981; }
+        .metric-icon.discounts { background: #f59e0b; }
+        .metric-icon.net-sales { background: #3b82f6; }
+        .metric-icon.gross-profit { background: #8b5cf6; }
+        .metric-icon.expenses { background: #ef4444; }
+        .metric-icon.net-profit { background: #06b6d4; }
+        .metric-icon.returns { background: #f97316; }
+
+        .metric-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            text-transform: uppercase;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .metric-subtitle {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .metric-change {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-top: 8px;
+            display: inline-block;
+        }
+
+        .metric-change.positive {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .metric-change.negative {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .detailed-breakdown {
+            background: white;
+            margin: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .breakdown-header {
+            background: #f8fafc;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .breakdown-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+        }
+
+        .breakdown-content {
+            padding: 20px;
+        }
+
+        .breakdown-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            color: #111827;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .breakdown-label {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .breakdown-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 16px;
+            color: #6b7280;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px;
+            text-align: center;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+
+        .no-data-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: #002fff;
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,47,255,0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .refresh-btn img {
+            filter: brightness(0) invert(1);
+        }
+
+        .refresh-btn:hover {
+            background: #1e40af;
+            transform: scale(1.05);
+        }
+
+        /* Chart Section Styles */
+        .chart-section {
+            background: white;
+            margin: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .chart-header {
+            background: #f8fafc;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin: 0;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chart-period-btn {
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #6b7280;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chart-period-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .chart-period-btn.active {
+            background: #002fff;
+            color: white;
+            border-color: #002fff;
+        }
+
+        .chart-container {
+            padding: 20px;
+            position: relative;
+            height: 400px;
+        }
+
+        .chart-stats {
+            background: #f8fafc;
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 12px;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .stat-value.positive {
+            color: #10b981;
+        }
+
+        .stat-value.negative {
+            color: #ef4444;
+        }
+
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                padding: 15px;
+            }
+            
+            .date-range-selector {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .date-range-selector select,
+            .date-range-selector button {
+                width: 100%;
+            }
+
+            .chart-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .chart-controls {
+                justify-content: center;
+            }
+
+            .chart-container {
+                height: 300px;
+                padding: 15px;
+            }
+
+            .chart-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <div class="navigation-bar-for-application-head-navbar">
+        <div class="navigation-bar-for-application-head-content">
+            <div class="navigation-bar-for-application-head-content-left-btn-for-show-shopping-cart">
+                <img src="assets/imgs/keyboard_backspace_50dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt="Back">
+                <span onclick="history.back()">Back</span>
+            </div>
+            <div class="navbar-app-LOGO-img">
+                <img src="assets/imgs/IMAPOS_LOGO.png" alt="ImaPOS">
+            </div>
+            <div class="navigation-bar-for-application-head-content-right-c">
+                <img src="assets/imgs/menu_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Menu">
+            </div>
+        </div>
+    </div>
+
+    <!-- Sales Summary Container -->
+    <div class="sales-summary-container">
+        <!-- Header -->
+        <div class="sales-summary-header">
+            <h1 class="sales-summary-title">Sales Summary</h1>
+            <p style="margin: 8px 0 0 0; opacity: 0.9;">Complete financial overview of your business</p>
+        </div>
+
+        <!-- Date Range Selector -->
+        <div class="date-range-selector">
+            <select id="dateRange">
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="thisWeek">This Week</option>
+                <option value="thisMonth">This Month</option>
+                <option value="lastMonth">Last Month</option>
+                <option value="all">All Time</option>
+            </select>
+            <button onclick="loadSalesSummary()">Refresh</button>
+        </div>
+
+        <!-- Sales Chart Section -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <h2 class="chart-title">Sales Analytics</h2>
+                <div class="chart-controls">
+                    <button class="chart-period-btn active" data-period="today" onclick="switchChartPeriod('today')">Today</button>
+                    <button class="chart-period-btn" data-period="week" onclick="switchChartPeriod('week')">This Week</button>
+                    <button class="chart-period-btn" data-period="month" onclick="switchChartPeriod('month')">This Month</button>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="salesChart"></canvas>
+            </div>
+            <div class="chart-stats">
+                <div class="chart-stat-item">
+                    <span class="stat-label">Total Sales</span>
+                    <span class="stat-value" id="chartTotalSales">LKR 0.00</span>
+                </div>
+                <div class="chart-stat-item">
+                    <span class="stat-label">Average Daily</span>
+                    <span class="stat-value" id="chartAverageDaily">LKR 0.00</span>
+                </div>
+                <div class="chart-stat-item">
+                    <span class="stat-label">Best Day</span>
+                    <span class="stat-value" id="chartBestDay">LKR 0.00</span>
+                </div>
+                <div class="chart-stat-item">
+                    <span class="stat-label">Growth</span>
+                    <span class="stat-value" id="chartGrowth">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-spinner">
+            <div class="spinner"></div>
+            <span style="margin-left: 10px;">Loading sales data...</span>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="error-message" style="display: none;">
+            <strong>Error loading data</strong><br>
+            <span id="errorMessage"></span>
+        </div>
+
+        <!-- No Data State -->
+        <div id="noDataState" class="no-data" style="display: none;">
+            <div class="no-data-icon"><img src="assets/imgs/dashboard_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Chart" style="width: 48px; height: 48px; opacity: 0.5;"></div>
+            <h3>No Sales Data</h3>
+            <p>No sales data found for the selected period.</p>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div id="metricsContainer" class="metrics-grid" style="display: none;">
+            <!-- Gross Sales -->
+            <div class="metric-card gross-sales">
+                <div class="metric-header">
+                    <div class="metric-icon gross-sales"><img src="assets/imgs/receipt_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Sales" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-title">Gross Sales</div>
+                </div>
+                <div class="metric-value" id="grossSalesValue">LKR 0.00</div>
+                <div class="metric-subtitle">Total revenue before discounts</div>
+                <div class="metric-change" id="grossSalesChange"></div>
+            </div>
+
+            <!-- Discounts -->
+            <div class="metric-card discounts">
+                <div class="metric-header">
+                    <div class="metric-icon discounts"><img src="assets/imgs/amend_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Discounts" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-title">Discounts</div>
+                </div>
+                <div class="metric-value" id="discountsValue">LKR 0.00</div>
+                <div class="metric-subtitle">Total discounts given</div>
+                <div class="metric-change" id="discountsChange"></div>
+            </div>
+
+            <!-- Net Sales -->
+            <div class="metric-card net-sales">
+                <div class="metric-header">
+                    <div class="metric-icon net-sales"><img src="assets/imgs/dashboard_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Net Sales" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-title">Net Sales</div>
+                </div>
+                <div class="metric-value" id="netSalesValue">LKR 0.00</div>
+                <div class="metric-subtitle">Revenue after discounts</div>
+                <div class="metric-change" id="netSalesChange"></div>
+            </div>
+
+            <!-- Gross Profit -->
+            <div class="metric-card gross-profit">
+                <div class="metric-header">
+                    <div class="metric-icon gross-profit"><img src="assets/imgs/add_diamond_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Profit" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-title">Gross Profit</div>
+                </div>
+                <div class="metric-value" id="grossProfitValue">LKR 0.00</div>
+                <div class="metric-subtitle">Profit before expenses</div>
+                <div class="metric-change" id="grossProfitChange"></div>
+            </div>
+
+            <!-- Expenses -->
+            <div class="metric-card expenses">
+                <div class="metric-header">
+                    <div class="metric-icon expenses"><img src="assets/imgs/finance_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Expenses" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-title">Expenses</div>
+                </div>
+                <div class="metric-value" id="expensesValue">LKR 0.00</div>
+                <div class="metric-subtitle">Total business expenses</div>
+                <div class="metric-change" id="expensesChange"></div>
+            </div>
+
+            <!-- Net Profit -->
+            <div class="metric-card net-profit">
+                <div class="metric-header">
+                    <div class="metric-icon net-profit"><img src="assets/imgs/loyalty_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Net Profit" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-title">Net Profit</div>
+                </div>
+                <div class="metric-value" id="netProfitValue">LKR 0.00</div>
+                <div class="metric-subtitle">Final profit after all costs</div>
+                <div class="metric-change" id="netProfitChange"></div>
+            </div>
+
+            <!-- Returns -->
+            <div class="metric-card returns">
+                <div class="metric-header">
+                    <div class="metric-icon returns"><img src="assets/imgs/repeat_on_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Returns" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-title">Returns</div>
+                </div>
+                <div class="metric-value" id="returnsValue">LKR 0.00</div>
+                <div class="metric-subtitle">Total refunded amount</div>
+                <div class="metric-change" id="returnsChange"></div>
+            </div>
+        </div>
+
+        <!-- Detailed Breakdown -->
+        <div id="detailedBreakdown" class="detailed-breakdown" style="display: none;">
+            <div class="breakdown-header">
+                <h2 class="breakdown-title">Detailed Financial Breakdown</h2>
+            </div>
+            <div class="breakdown-content">
+                <div class="breakdown-grid">
+                    <div>
+                        <h4 style="margin: 0 0 15px 0; color: #374151;">Sales Summary</h4>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Total Bills</span>
+                            <span class="breakdown-value" id="totalBills">0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Items Sold</span>
+                            <span class="breakdown-value" id="totalItemsSold">0</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Average Bill Value</span>
+                            <span class="breakdown-value" id="averageBillValue">LKR 0.00</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Gross Sales</span>
+                            <span class="breakdown-value" id="breakdownGrossSales">LKR 0.00</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Total Discounts</span>
+                            <span class="breakdown-value" id="breakdownDiscounts">LKR 0.00</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Net Sales</span>
+                            <span class="breakdown-value" id="breakdownNetSales">LKR 0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 style="margin: 0 0 15px 0; color: #374151;">Profit & Loss</h4>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Cost of Goods Sold</span>
+                            <span class="breakdown-value" id="costOfGoodsSold">LKR 0.00</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Gross Profit</span>
+                            <span class="breakdown-value" id="breakdownGrossProfit">LKR 0.00</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Total Expenses</span>
+                            <span class="breakdown-value" id="breakdownExpenses">LKR 0.00</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Total Returns</span>
+                            <span class="breakdown-value" id="breakdownReturns">LKR 0.00</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Net Profit</span>
+                            <span class="breakdown-value" id="breakdownNetProfit">LKR 0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refresh Button -->
+    <button class="refresh-btn" onclick="loadSalesSummary()" title="Refresh Data">
+        <img src="assets/imgs/repeat_on_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Refresh" style="width: 24px; height: 24px;">
+    </button>
+
+    <!-- Scripts -->
+    <script type="module" src="./js/sales_summary.js"></script>
+</body>
+</html>

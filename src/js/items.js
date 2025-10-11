@@ -497,6 +497,8 @@ async function handleCompleteBill() {
     const finalResult = { billId: billRef.key, billNumber };
 
     alert(`Bill #${finalResult.billNumber} saved and stock updated.`);
+    document.getElementById("bill-after-of-completed").style.display = "block";
+    document.getElementById("bill-before-of-completed").style.display = "none";
 
     // Update cached stock for offline accuracy
     if (window.updateCachedStock) {

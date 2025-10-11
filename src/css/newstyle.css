@@ -1,0 +1,32 @@
+.bill-filters {
+    width: 100%;
+    display: flex;
+}
+
+.item-or-bills-showing-terminal-window-navbar-left {
+    width: 100%;
+    display: flex;
+    gap: 5px;
+}
+
+.item-or-bills-showing-terminal-window-navbar-left input {
+    width: 100%;
+    height: 38px;
+    background-color: #ffffff44;
+    border: none;
+    outline: none;
+    font-size: 12px;
+    border-radius: 4px;
+    color: white;
+    padding: 10px;
+}
+
+.item-or-bills-showing-terminal-window-navbar-left input::placeholder {
+    color: white;
+}
+
+.item-or-bills-showing-terminal-window-navbar-left button {
+    width: 75px;
+    height: 38px;
+    background-color: #ff7700;
+}

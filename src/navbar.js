@@ -68,7 +68,8 @@ document.getElementById("application-navbar-for-subpage").innerHTML = `
 
         <div class="application-sideba-for-manage-content-card-layout">
 
-          <div class="application-sideba-for-manage-content-card-layout-card">
+          <a href="./returns.html">
+            <div class="application-sideba-for-manage-content-card-layout-card">
             <div class="application-sideba-for-manage-content-card-layout-content">
               <div class="application-sideba-for-manage-content-card-layout-img">
                 <img src="./assets/imgs/repeat_on_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
@@ -77,7 +78,8 @@ document.getElementById("application-navbar-for-subpage").innerHTML = `
                 Item Return
               </div>
             </div>
-          </div>
+            </div>
+          </a>
 
           <div class="application-sideba-for-manage-content-card-layout-card">
             <div class="application-sideba-for-manage-content-card-layout-content">
@@ -105,16 +107,18 @@ document.getElementById("application-navbar-for-subpage").innerHTML = `
             </div>
           </div>
 
-          <div class="application-sideba-for-manage-content-card-layout-card">
-            <div class="application-sideba-for-manage-content-card-layout-content">
-              <div class="application-sideba-for-manage-content-card-layout-img">
-                <img src="./assets/imgs/identity_platform_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
-              </div>
-              <div class="application-sideba-for-manage-content-card-layout-txt">
-                Access Manage
+          <a href="./access_manage.html">
+            <div class="application-sideba-for-manage-content-card-layout-card">
+              <div class="application-sideba-for-manage-content-card-layout-content">
+                <div class="application-sideba-for-manage-content-card-layout-img">
+                  <img src="./assets/imgs/identity_platform_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                </div>
+                <div class="application-sideba-for-manage-content-card-layout-txt">
+                  Access Manage
+                </div>
               </div>
             </div>
-          </div>
+          </a>
 
         </div>
         <div class="application-sideba-for-manage-content-card-layout">
@@ -130,7 +134,8 @@ document.getElementById("application-navbar-for-subpage").innerHTML = `
             </div>
           </div>
 
-          <div class="application-sideba-for-manage-content-card-layout-card">
+          <a href="./customers.html">
+            <div class="application-sideba-for-manage-content-card-layout-card">
             <div class="application-sideba-for-manage-content-card-layout-content">
               <div class="application-sideba-for-manage-content-card-layout-img">
                 <img src="./assets/imgs/loyalty_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
@@ -139,7 +144,8 @@ document.getElementById("application-navbar-for-subpage").innerHTML = `
                 Customers
               </div>
             </div>
-          </div>
+            </div>
+          </a>
         </div>
         <div class="space-f0r-card-sectionsd0sdas-asdas"></div>
       </div>
