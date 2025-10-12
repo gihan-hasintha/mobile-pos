@@ -58,3 +58,29 @@
 .stock-item-buying-price {
     display: none;
 }
+
+.searchbar-for-stock-manage-content-c {
+    width: 100%;
+    padding-bottom: 10px;
+    background-color: #002fff;
+}
+
+.searchbar-for-stock-manage-content {
+    width: 92%;
+    margin: 0 auto;
+}
+
+.searchbar-for-stock-manage-content-c input {
+    width: 100%;
+    font-size: 13px;
+    border-radius: 4px;
+    outline: none;
+    border: none;
+    color: white;
+    background-color: #ffffff2d;
+    padding: 11px;
+}
+
+.searchbar-for-stock-manage-content-c input::placeholder {
+    color: #ffffff8e;
+}

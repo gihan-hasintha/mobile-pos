@@ -290,9 +290,17 @@ function calculateMetrics(data) {
     };
 }
 
+// Number formatting function with comma separators
+function formatNumberWithCommas(value) {
+    return Number(value).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
 function displayMetrics(metrics) {
-    // Format currency values
-    const formatCurrency = (value) => `LKR ${Number(value).toFixed(2)}`;
+    // Format currency values with comma separators
+    const formatCurrency = (value) => `LKR ${formatNumberWithCommas(value)}`;
     
     // Update main metric cards
     document.getElementById('grossSalesValue').textContent = formatCurrency(metrics.grossSales);
@@ -322,7 +330,7 @@ function updateChangeIndicator(elementId, isPositive) {
 }
 
 function displayDetailedBreakdown(data, metrics) {
-    const formatCurrency = (value) => `LKR ${Number(value).toFixed(2)}`;
+    const formatCurrency = (value) => `LKR ${formatNumberWithCommas(value)}`;
     
     // Update breakdown values
     document.getElementById('totalBills').textContent = metrics.totalBills;

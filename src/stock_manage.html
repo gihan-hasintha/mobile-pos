@@ -187,6 +187,26 @@
       el.style.left = (currentLeft === "0px" || currentLeft === "0") ? "2050px" : "0";
     }
       </script>
+
+      <div id="searchbar-for-stock-manage">
+        <div class="searchbar-for-stock-manage-content-c">
+            <div class="searchbar-for-stock-manage-content">
+                    <input type="text" id="stock-search" placeholder="Search items..." class="search-input">
+                    <button onclick="searchItems()" class="search-btn" style="display: none;">Search</button>
+            </div>
+            <div class="searchbar-for-stock-manage-content-sd">
+                <select id="category-filter" class="filter-select">
+                    <option value="all">All Categories</option>
+                  </select>
+                  <select id="stock-filter" class="filter-select">
+                    <option value="all">All Stock</option>
+                    <option value="in-stock">In Stock</option>
+                    <option value="low-stock">Low Stock</option>
+                    <option value="out-of-stock">Out of Stock</option>
+                  </select>
+            </div>
+        </div>
+      </div>
       
       <div id="navigation-bar-for-application-head--for-searchbar">
         <div class="navigation-bar-for-application-head--for-searchbar-content">
@@ -197,20 +217,9 @@
         
               <!-- Search and Filter Bar -->
               <div class="search-filter-bar">
-                <div class="search-container">
-                  <input type="text" id="stock-search" placeholder="Search items..." class="search-input">
-                  <button onclick="searchItems()" class="search-btn">Search</button>
-                </div>
+
                 <div class="filter-container">
-                  <select id="category-filter" class="filter-select">
-                    <option value="all">All Categories</option>
-                  </select>
-                  <select id="stock-filter" class="filter-select">
-                    <option value="all">All Stock</option>
-                    <option value="in-stock">In Stock</option>
-                    <option value="low-stock">Low Stock</option>
-                    <option value="out-of-stock">Out of Stock</option>
-                  </select>
+
                 </div>
               </div>
           </div>

@@ -178,9 +178,9 @@ function renderItemsGrid() {
       </div>
     `;
     
-    // Add click handler for the card - show selling details
+    // Add click handler for the card - open edit modal with selling details
     card.addEventListener("click", (e) => {
-      showItemDetails(item.id);
+      showItemDetails(item.id);      addItemToSelection(item);
       
       // Add visual feedback
       card.style.transform = 'scale(0.95)';
@@ -243,9 +243,6 @@ async function showItemDetails(itemId) {
   
   // Get selling quantities from bills
   let sellingQuantities = [];
-  let totalRevenue = 0;
-  let totalProfit = 0;
-  
   try {
     const billsSnap = await get(rtdbBillsRef);
     if (billsSnap.exists()) {
@@ -254,21 +251,13 @@ async function showItemDetails(itemId) {
         if (bill.lines) {
           bill.lines.forEach(line => {
             if (line.itemId === itemId) {
-              const saleData = {
+              sellingQuantities.push({
                 billNumber: bill.billNumber,
                 quantity: line.quantity,
                 salePrice: line.salePrice,
                 total: line.total,
-                date: bill.createdAt,
-                customerName: bill.customerName || 'Walk-in Customer'
-              };
-              sellingQuantities.push(saleData);
-              
-              // Calculate revenue and profit
-              totalRevenue += line.total;
-              if (item.buyingPrice) {
-                totalProfit += (line.salePrice - item.buyingPrice) * line.quantity;
-              }
+                date: bill.createdAt
+              });
             }
           });
         }
@@ -278,12 +267,8 @@ async function showItemDetails(itemId) {
     console.error("Failed to load selling quantities", err);
   }
   
-  // Calculate totals
+  // Calculate total sold
   const totalSold = sellingQuantities.reduce((sum, sale) => sum + sale.quantity, 0);
-  const averagePrice = totalSold > 0 ? totalRevenue / totalSold : 0;
-  
-  // Sort by date (most recent first)
-  sellingQuantities.sort((a, b) => new Date(b.date) - new Date(a.date));
   
   const modal = document.getElementById("item-details-modal");
   const content = document.getElementById("item-details-content");
@@ -318,51 +303,26 @@ async function showItemDetails(itemId) {
           <span class="value">$${Number(item.discountPrice).toFixed(2)}</span>
         </div>
         ` : ''}
-      </div>
-      
-      <div class="selling-summary">
-        <h4>Sales Summary</h4>
-        <div class="summary-grid">
-          <div class="summary-item">
-            <span class="summary-label">Total Sold:</span>
-            <span class="summary-value">${totalSold} units</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Total Revenue:</span>
-            <span class="summary-value">$${totalRevenue.toFixed(2)}</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Average Price:</span>
-            <span class="summary-value">$${averagePrice.toFixed(2)}</span>
-          </div>
-          ${item.buyingPrice ? `
-          <div class="summary-item">
-            <span class="summary-label">Total Profit:</span>
-            <span class="summary-value profit">$${totalProfit.toFixed(2)}</span>
-          </div>
-          ` : ''}
+        <div class="info-row">
+          <span class="label">Total Sold:</span>
+          <span class="value">${totalSold}</span>
         </div>
       </div>
       
       ${sellingQuantities.length > 0 ? `
       <div class="selling-history">
-        <h4>Recent Sales (Last 10)</h4>
+        <h4>Selling History</h4>
         <div class="selling-list">
           ${sellingQuantities.slice(0, 10).map(sale => `
             <div class="selling-item">
-              <div class="sale-header">
+              <div class="sale-info">
                 <span class="bill-number">Bill #${sale.billNumber}</span>
-                <span class="sale-date">${new Date(sale.date).toLocaleDateString()}</span>
+                <span class="sale-date">${sale.date}</span>
               </div>
               <div class="sale-details">
-                <div class="sale-info">
-                  <span class="customer">${sale.customerName}</span>
-                  <span class="quantity">Qty: ${sale.quantity}</span>
-                </div>
-                <div class="sale-pricing">
-                  <span class="price">@$${Number(sale.salePrice).toFixed(2)}</span>
-                  <span class="total">Total: $${Number(sale.total).toFixed(2)}</span>
-                </div>
+                <span class="quantity">Qty: ${sale.quantity}</span>
+                <span class="price">$${Number(sale.salePrice).toFixed(2)}</span>
+                <span class="total">Total: $${Number(sale.total).toFixed(2)}</span>
               </div>
             </div>
           `).join('')}

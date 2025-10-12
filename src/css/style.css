@@ -1094,3 +1094,15 @@ table, th, td { border: 1px solid black; text-align: center; padding: 6px; }
   align-items: center;
   gap: 10px;
 }
+
+
+
+
+.search-modal-header-bt button {
+  background-color: #ffffff34;
+  color: white;
+  border: none;
+  height: 42px;
+  outline: none;
+  border: none;
+}

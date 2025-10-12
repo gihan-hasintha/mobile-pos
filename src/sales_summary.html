@@ -19,9 +19,10 @@
         }
 
         .sales-summary-header {
-            background: linear-gradient(135deg, #002fff 0%, #1e40af 100%);
+            background-color: #002fff;
             color: white;
             padding: 20px;
+            padding-top: 5px;
             text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
@@ -116,6 +117,7 @@
         }
 
         .metric-icon img {
+            width: 20px;
             filter: brightness(0) invert(1);
         }
 
@@ -422,20 +424,164 @@
 </head>
 <body>
     <!-- Navigation Bar -->
-    <div class="navigation-bar-for-application-head-navbar">
-        <div class="navigation-bar-for-application-head-content">
-            <div class="navigation-bar-for-application-head-content-left-btn-for-show-shopping-cart">
-                <img src="assets/imgs/keyboard_backspace_50dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt="Back">
-                <span onclick="history.back()">Back</span>
+    <div id="navigation-bar-for-application-head">
+        <div class="navigation-bar-for-application-head-navbar">
+          <div class="navigation-bar-for-application-head-content">
+            <div class="navigation-bar-for-application-head-content-left" onclick="showcartlistoncashieraddedtocart()">
+                        <div class="navigation-bar-for-application-head-content-right-button" onclick="history.back()">
+                  <img src="./assets/imgs/keyboard_backspace_50dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+                </div>
             </div>
-            <div class="navbar-app-LOGO-img">
-                <img src="assets/imgs/IMAPOS_LOGO.png" alt="ImaPOS">
+            <div class="navigation-bar-for-application-head-content-center">
+              <div class="navbar-app-LOGO-img">
+                <img src="./assets/imgs/IMAPOS_LOGO.png" alt="">
+              </div>
             </div>
-            <div class="navigation-bar-for-application-head-content-right-c">
-                <img src="assets/imgs/menu_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Menu">
+            <div class="navigation-bar-for-application-head-content-right">
+              <div class="navigation-bar-for-application-head-content-right-c">
+                <div class="navigation-bar-for-application-head-content-right-button" id="navigation-bar-for-application-head-content-right-button-close-searchbar-show" style="display: none;" onclick="openSearchModal()">
+                  <img src="./assets/imgs/search-interface-symbol.png" alt="">
+                </div>
+    
+                <div class="navigation-bar-for-application-head-content-right-button" id="navigation-bar-for-application-head-content-right-button-close-searchbar" style="display: none;" onclick="closeSearchModal()">
+                  <img src="./assets/imgs/close_50dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+                </div>
+    
+                <div class="navigation-bar-for-application-head-content-right-button" onclick="openmenubaronapplication()">
+                  <img src="./assets/imgs/menu_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
+        
+        <div class="navigation-bar-for-application-head-navbar-space"></div>
+      </div>
+    
+      <div id="application-sideba-for-manage" style="display: block;">
+        <div id="application-sideba-for-manage-div">
+          <div class="application-sideba-for-manage-content">
+            <div class="application-sideba-for-manage-content-card-layout">
+    
+              <a href="./expenses.html">
+                <div class="application-sideba-for-manage-content-card-layout-card">
+                  <div class="application-sideba-for-manage-content-card-layout-content">
+                    <div class="application-sideba-for-manage-content-card-layout-img">
+                      <img src="./assets/imgs/receipt_long_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                    </div>
+                    <div class="application-sideba-for-manage-content-card-layout-txt">
+                      ADD expenses
+                    </div>
+                  </div>
+                </div>
+              </a>
+    
+              <a href="./sales_summary.html">
+                <div class="application-sideba-for-manage-content-card-layout-card">
+                  <div class="application-sideba-for-manage-content-card-layout-content">
+                    <div class="application-sideba-for-manage-content-card-layout-img">
+                      <img src="./assets/imgs/finance_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                    </div>
+                    <div class="application-sideba-for-manage-content-card-layout-txt">
+                      Sales Summary
+                    </div>
+                  </div>
+                </div>
+              </a>
+    
+            </div>
+    
+            <div class="application-sideba-for-manage-content-card-layout">
+    
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/repeat_on_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    Item Return
+                  </div>
+                </div>
+              </div>
+    
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/shelves_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    Stock Manage
+                  </div>
+                </div>
+              </div>
+    
+            </div>
+    
+            <div class="application-sideba-for-manage-content-card-layout">
+    
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/receipt_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    Total Bill's
+                  </div>
+                </div>
+              </div>
+    
+              <a href="./access_manage.html">
+                <div class="application-sideba-for-manage-content-card-layout-card">
+                  <div class="application-sideba-for-manage-content-card-layout-content">
+                    <div class="application-sideba-for-manage-content-card-layout-img">
+                      <img src="./assets/imgs/identity_platform_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                    </div>
+                    <div class="application-sideba-for-manage-content-card-layout-txt">
+                      Access Manage
+                    </div>
+                  </div>
+                </div>
+              </a>
+    
+            </div>
+            <div class="application-sideba-for-manage-content-card-layout">
+    
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/add_diamond_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    ADD items and categories
+                  </div>
+                </div>
+              </div>
+    
+              <a href="./customers.html">
+                <div class="application-sideba-for-manage-content-card-layout-card">
+                  <div class="application-sideba-for-manage-content-card-layout-content">
+                    <div class="application-sideba-for-manage-content-card-layout-img">
+                      <img src="./assets/imgs/loyalty_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                    </div>
+                    <div class="application-sideba-for-manage-content-card-layout-txt">
+                      Customers
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="space-f0r-card-sectionsd0sdas-asdas"></div>
+          </div>
+        </div>
+      </div>
+    
+      <script>
+        function openmenubaronapplication() {
+      const el = document.getElementById("application-sideba-for-manage-div");
+      const currentLeft = window.getComputedStyle(el).left;
+      el.style.left = (currentLeft === "0px" || currentLeft === "0") ? "2050px" : "0";
+    }
+      </script>
 
     <!-- Sales Summary Container -->
     <div class="sales-summary-container">
@@ -515,7 +661,7 @@
             <!-- Gross Sales -->
             <div class="metric-card gross-sales">
                 <div class="metric-header">
-                    <div class="metric-icon gross-sales"><img src="assets/imgs/receipt_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Sales" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-icon gross-sales"><img src="assets/imgs/bar_chart_30dp_FFFFFF_FILL1_wght400_GRAD0_opsz24.png" alt="Sales" style="width: 20px; height: 20px;"></div>
                     <div class="metric-title">Gross Sales</div>
                 </div>
                 <div class="metric-value" id="grossSalesValue">LKR 0.00</div>
@@ -526,7 +672,7 @@
             <!-- Discounts -->
             <div class="metric-card discounts">
                 <div class="metric-header">
-                    <div class="metric-icon discounts"><img src="assets/imgs/amend_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Discounts" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-icon discounts"><img src="assets/imgs/percent_discount_30dp_FFFFFF_FILL1_wght400_GRAD0_opsz24.png" alt="Discounts" style="width: 20px; height: 20px;"></div>
                     <div class="metric-title">Discounts</div>
                 </div>
                 <div class="metric-value" id="discountsValue">LKR 0.00</div>
@@ -537,7 +683,7 @@
             <!-- Net Sales -->
             <div class="metric-card net-sales">
                 <div class="metric-header">
-                    <div class="metric-icon net-sales"><img src="assets/imgs/dashboard_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Net Sales" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-icon net-sales"><img src="assets/imgs/finance_mode_30dp_FFFFFF_FILL1_wght400_GRAD0_opsz24.png" alt="Net Sales" style="width: 20px; height: 20px;"></div>
                     <div class="metric-title">Net Sales</div>
                 </div>
                 <div class="metric-value" id="netSalesValue">LKR 0.00</div>
@@ -548,7 +694,7 @@
             <!-- Gross Profit -->
             <div class="metric-card gross-profit">
                 <div class="metric-header">
-                    <div class="metric-icon gross-profit"><img src="assets/imgs/add_diamond_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Profit" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-icon gross-profit"><img src="assets/imgs/trending_up_30dp_FFFFFF_FILL1_wght400_GRAD0_opsz24.png" alt="Profit" style="width: 20px; height: 20px;"></div>
                     <div class="metric-title">Gross Profit</div>
                 </div>
                 <div class="metric-value" id="grossProfitValue">LKR 0.00</div>
@@ -559,7 +705,7 @@
             <!-- Expenses -->
             <div class="metric-card expenses">
                 <div class="metric-header">
-                    <div class="metric-icon expenses"><img src="assets/imgs/finance_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Expenses" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-icon expenses"><img src="assets/imgs/money_bag_30dp_FFFFFF_FILL1_wght400_GRAD0_opsz24.png" alt="Expenses" style="width: 20px; height: 20px;"></div>
                     <div class="metric-title">Expenses</div>
                 </div>
                 <div class="metric-value" id="expensesValue">LKR 0.00</div>
@@ -570,7 +716,7 @@
             <!-- Net Profit -->
             <div class="metric-card net-profit">
                 <div class="metric-header">
-                    <div class="metric-icon net-profit"><img src="assets/imgs/loyalty_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Net Profit" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-icon net-profit"><img src="assets/imgs/attach_money_30dp_FFFFFF_FILL1_wght400_GRAD0_opsz24.png" alt="Net Profit" style="width: 20px; height: 20px;"></div>
                     <div class="metric-title">Net Profit</div>
                 </div>
                 <div class="metric-value" id="netProfitValue">LKR 0.00</div>
@@ -581,7 +727,7 @@
             <!-- Returns -->
             <div class="metric-card returns">
                 <div class="metric-header">
-                    <div class="metric-icon returns"><img src="assets/imgs/repeat_on_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Returns" style="width: 20px; height: 20px;"></div>
+                    <div class="metric-icon returns"><img src="assets/imgs/wifi_home_30dp_FFFFFF_FILL1_wght400_GRAD0_opsz24.png" alt="Returns" style="width: 20px; height: 20px;"></div>
                     <div class="metric-title">Returns</div>
                 </div>
                 <div class="metric-value" id="returnsValue">LKR 0.00</div>
@@ -655,7 +801,7 @@
 
     <!-- Refresh Button -->
     <button class="refresh-btn" onclick="loadSalesSummary()" title="Refresh Data">
-        <img src="assets/imgs/repeat_on_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Refresh" style="width: 24px; height: 24px;">
+        <img src="assets/imgs/cached_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="Refresh" style="width: 24px; height: 24px;">
     </button>
 
     <!-- Scripts -->
