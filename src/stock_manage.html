@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Stock Management - ImaPOS</title>
+    <meta
+      name="viewport"
+      content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+
+    <script
+      type="module"
+      src="https://unpkg.com/@ionic/pwa-elements@latest/dist/ionicpwaelements/ionicpwaelements.esm.js"
+    ></script>
+    <script
+      nomodule
+      src="https://unpkg.com/@ionic/pwa-elements@latest/dist/ionicpwaelements/ionicpwaelements.js"
+    ></script>
+
+    <link rel="icon" type="image/x-icon" href="./assets/icon/favicon.ico" />
+    <link rel="manifest" href="./manifest.json" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="stylesheet" href="./css/stockstyle.css" />
+    <meta name="theme-color" content="#31d53d" />
+  </head>
+  <body>
+    <capacitor-welcome></capacitor-welcome>
+
+    <!-- Navigation Bar -->
+    <div id="navigation-bar-for-application-head">
+        <div class="navigation-bar-for-application-head-navbar">
+          <div class="navigation-bar-for-application-head-content">
+            <div class="navigation-bar-for-application-head-content-left" onclick="showcartlistoncashieraddedtocart()">
+                        <div class="navigation-bar-for-application-head-content-right-button" onclick="history.back()">
+                  <img src="./assets/imgs/keyboard_backspace_50dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+                </div>
+            </div>
+            <div class="navigation-bar-for-application-head-content-center">
+              <div class="navbar-app-LOGO-img">
+                <img src="./assets/imgs/IMAPOS_LOGO.png" alt="">
+              </div>
+            </div>
+            <div class="navigation-bar-for-application-head-content-right">
+                <div class="navigation-bar-for-application-head-content-right-c">
+                  <div class="navigation-bar-for-application-head-content-right-button" id="navigation-bar-for-application-head-content-right-button-close-searchbar-show" onclick="openSearchModal()">
+                    <img src="./assets/imgs/search-interface-symbol.png" alt="">
+                  </div>
+    
+                  <div class="navigation-bar-for-application-head-content-right-button" id="navigation-bar-for-application-head-content-right-button-close-searchbar" style="display: none;" onclick="closeSearchModal()">
+                    <img src="./assets/imgs/close_50dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+                  </div>
+    
+                  <div class="navigation-bar-for-application-head-content-right-button" onclick="openmenubaronapplication()">
+                    <img src="./assets/imgs/menu_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+        
+        <div class="navigation-bar-for-application-head-navbar-space"></div>
+      </div>
+    
+      <div id="application-sideba-for-manage" style="display: block;">
+        <div id="application-sideba-for-manage-div">
+          <div class="application-sideba-for-manage-content">
+            <div class="application-sideba-for-manage-content-card-layout">
+    
+              <a href="./expenses.html">
+                <div class="application-sideba-for-manage-content-card-layout-card">
+                  <div class="application-sideba-for-manage-content-card-layout-content">
+                    <div class="application-sideba-for-manage-content-card-layout-img">
+                      <img src="./assets/imgs/receipt_long_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                    </div>
+                    <div class="application-sideba-for-manage-content-card-layout-txt">
+                      ADD expenses
+                    </div>
+                  </div>
+                </div>
+              </a>
+    
+              <a href="./sales_summary.html">
+                <div class="application-sideba-for-manage-content-card-layout-card">
+                  <div class="application-sideba-for-manage-content-card-layout-content">
+                    <div class="application-sideba-for-manage-content-card-layout-img">
+                      <img src="./assets/imgs/finance_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                    </div>
+                    <div class="application-sideba-for-manage-content-card-layout-txt">
+                      Sales Summary
+                    </div>
+                  </div>
+                </div>
+              </a>
+    
+            </div>
+    
+            <div class="application-sideba-for-manage-content-card-layout">
+    
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/repeat_on_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    Item Return
+                  </div>
+                </div>
+              </div>
+    
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/shelves_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    Stock Manage
+                  </div>
+                </div>
+              </div>
+    
+            </div>
+    
+            <div class="application-sideba-for-manage-content-card-layout">
+    
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/receipt_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    Total Bill's
+                  </div>
+                </div>
+              </div>
+    
+              <a href="./access_manage.html">
+                <div class="application-sideba-for-manage-content-card-layout-card">
+                  <div class="application-sideba-for-manage-content-card-layout-content">
+                    <div class="application-sideba-for-manage-content-card-layout-img">
+                      <img src="./assets/imgs/identity_platform_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                    </div>
+                    <div class="application-sideba-for-manage-content-card-layout-txt">
+                      Access Manage
+                    </div>
+                  </div>
+                </div>
+              </a>
+    
+            </div>
+            <div class="application-sideba-for-manage-content-card-layout">
+    
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/add_diamond_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    ADD items and categories
+                  </div>
+                </div>
+              </div>
+    
+              <a href="./customers.html">
+                <div class="application-sideba-for-manage-content-card-layout-card">
+                  <div class="application-sideba-for-manage-content-card-layout-content">
+                    <div class="application-sideba-for-manage-content-card-layout-img">
+                      <img src="./assets/imgs/loyalty_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                    </div>
+                    <div class="application-sideba-for-manage-content-card-layout-txt">
+                      Customers
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="space-f0r-card-sectionsd0sdas-asdas"></div>
+          </div>
+        </div>
+      </div>
+    
+      <script>
+        function openmenubaronapplication() {
+      const el = document.getElementById("application-sideba-for-manage-div");
+      const currentLeft = window.getComputedStyle(el).left;
+      el.style.left = (currentLeft === "0px" || currentLeft === "0") ? "2050px" : "0";
+    }
+      </script>
+      
+      <div id="navigation-bar-for-application-head--for-searchbar">
+        <div class="navigation-bar-for-application-head--for-searchbar-content">
+            <div class="page-header">
+                <h1>Stock Management</h1>
+                <p>Manage your inventory and item details</p>
+              </div>
+        
+              <!-- Search and Filter Bar -->
+              <div class="search-filter-bar">
+                <div class="search-container">
+                  <input type="text" id="stock-search" placeholder="Search items..." class="search-input">
+                  <button onclick="searchItems()" class="search-btn">Search</button>
+                </div>
+                <div class="filter-container">
+                  <select id="category-filter" class="filter-select">
+                    <option value="all">All Categories</option>
+                  </select>
+                  <select id="stock-filter" class="filter-select">
+                    <option value="all">All Stock</option>
+                    <option value="in-stock">In Stock</option>
+                    <option value="low-stock">Low Stock</option>
+                    <option value="out-of-stock">Out of Stock</option>
+                  </select>
+                </div>
+              </div>
+          </div>
+      </div>
+      <div id="application-sideba-for-manage" style="display: block;">
+        <div id="application-sideba-for-manage-div">
+          <div class="application-sideba-for-manage-content">
+            <div class="application-sideba-for-manage-content-card-layout">
+    
+              <a href="./expenses.html">
+                <div class="application-sideba-for-manage-content-card-layout-card">
+                  <div class="application-sideba-for-manage-content-card-layout-content">
+                    <div class="application-sideba-for-manage-content-card-layout-img">
+                      <img src="./assets/imgs/receipt_long_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                    </div>
+                    <div class="application-sideba-for-manage-content-card-layout-txt">
+                      ADD expenses
+                    </div>
+                  </div>
+                </div>
+              </a>
+    
+              <a href="./sales_summary.html">
+                <div class="application-sideba-for-manage-content-card-layout-card">
+                  <div class="application-sideba-for-manage-content-card-layout-content">
+                    <div class="application-sideba-for-manage-content-card-layout-img">
+                      <img src="./assets/imgs/finance_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                    </div>
+                    <div class="application-sideba-for-manage-content-card-layout-txt">
+                      Sales Summary
+                    </div>
+                  </div>
+                </div>
+              </a>
+    
+            </div>
+    
+            <div class="application-sideba-for-manage-content-card-layout">
+    
+              <a href="./returns.html">
+                <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/repeat_on_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    Item Return
+                  </div>
+                </div>
+                </div>
+              </a>
+    
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/shelves_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    Stock Manage
+                  </div>
+                </div>
+              </div>
+    
+            </div>
+    
+            <div class="application-sideba-for-manage-content-card-layout">
+    
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/receipt_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    Total Bill's
+                  </div>
+                </div>
+              </div>
+    
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/identity_platform_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    Access Manage
+                  </div>
+                </div>
+              </div>
+    
+            </div>
+            <div class="application-sideba-for-manage-content-card-layout">
+    
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/add_diamond_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    ADD items and categories
+                  </div>
+                </div>
+              </div>
+    
+              <a href="./customers.html">
+                <div class="application-sideba-for-manage-content-card-layout-card">
+                  <div class="application-sideba-for-manage-content-card-layout-content">
+                    <div class="application-sideba-for-manage-content-card-layout-img">
+                      <img src="./assets/imgs/loyalty_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                    </div>
+                    <div class="application-sideba-for-manage-content-card-layout-txt">
+                      Customers
+                    </div>
+                  </div>
+                </div>
+              </a>
+
+              <a href="./stock_manage.html">
+                <div class="application-sideba-for-manage-content-card-layout-card">
+                  <div class="application-sideba-for-manage-content-card-layout-content">
+                    <div class="application-sideba-for-manage-content-card-layout-img">
+                      <img src="./assets/imgs/inventory_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                    </div>
+                    <div class="application-sideba-for-manage-content-card-layout-txt">
+                      Stock Management
+                    </div>
+                  </div>
+                </div>
+              </a>
+            </div>
+            <div class="space-f0r-card-sectionsd0sdas-asdas"></div>
+          </div>
+        </div>
+      </div>
+      
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Page Header -->
+
+      <!-- Items Grid -->
+      <div id="stock-items-grid" class="stock-items-grid">
+        <!-- Items will be loaded here -->
+      </div>
+
+      <!-- Edit Item Modal -->
+      <div id="edit-item-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Edit Item Details</h2>
+            <span class="close" onclick="closeEditModal()">&times;</span>
+          </div>
+          <form id="edit-item-form" class="edit-form">
+            <input type="hidden" id="edit-item-id">
+            
+            <div class="form-group">
+              <label for="edit-item-name">Item Name *</label>
+              <input type="text" id="edit-item-name" required>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-item-category">Category *</label>
+              <select id="edit-item-category" required>
+                <option value="">Select Category</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-item-code">Item Code *</label>
+              <input type="text" id="edit-item-code" required>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-item-buying-price">Buying Price</label>
+              <input type="number" id="edit-item-buying-price" step="0.01" min="0">
+            </div>
+
+            <div class="form-group">
+              <label for="edit-item-price">Selling Price *</label>
+              <input type="number" id="edit-item-price" step="0.01" min="0" required>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-item-discount-price">Discounted Price</label>
+              <input type="number" id="edit-item-discount-price" step="0.01" min="0">
+            </div>
+
+            <div class="form-group">
+              <label for="edit-item-stock">Current Stock *</label>
+              <input type="number" id="edit-item-stock" min="0" required>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" onclick="closeEditModal()" class="btn btn-secondary">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Item Details Modal -->
+      <div id="item-details-modal" class="modal">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>Item Details</h2>
+          </div>
+          <div id="item-details-content">
+            <!-- Item details will be loaded here -->
+          </div>
+          <div class="modal-actions">
+            <button onclick="closeItemDetailsModal()" class="btn btn-secondary">Close</button>
+            <button onclick="openEditModal()" class="btn btn-primary">Edit Item</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        function openmenubaronapplication() {
+          const el = document.getElementById("application-sideba-for-manage-div");
+          const currentLeft = window.getComputedStyle(el).left;
+          el.style.left = (currentLeft === "0px" || currentLeft === "0") ? "2050px" : "0";
+        }
+  
+        function showaddandmanagecategoriesanditems() {
+          document.getElementById("items-and-categories-creataing-window-show-and-hider").style.display = "block";
+        }
+  
+        function itemsandcategoriescreataingwindowshowandhiderbackclose() {
+          document.getElementById("items-and-categories-creataing-window-show-and-hider").style.display = "none";
+        }
+  
+      </script>
+    <script type="module" src="./js/stock_manage.js"></script>
+    <script src="./js/navbar.js"></script>
+  </body>
+</html>

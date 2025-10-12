@@ -1,0 +1,60 @@
+/* Stock Manage */
+
+.stock-items-grid {
+  width: 95%;
+  margin: 10px auto 20px auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+  
+.stock-item-card {
+  background: #ffffff;
+  color: #000000;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+
+.stock-item-name {
+    font-size: 18px;
+    padding-bottom: 7px;
+}
+
+.stock-status {
+    padding: 5px 9px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    width: fit-content;
+    display: block;
+    background-color: #f0f8ff3c;
+}
+
+.in-stock {
+    background-color: #44ff0b67;
+}
+
+.out-of-stock {
+    background-color: #ff0b0b44;
+}
+
+.low-stock {
+    background-color: #ffc01468;
+}
+
+.stock-item-code {
+    padding-bottom: 5px;
+}
+
+.stock-item-category {
+    padding-bottom: 5px;
+}
+
+.stock-item-buying-price {
+    display: block;
+    width: 100%;
+}
+
+.stock-item-buying-price {
+    display: none;
+}
