@@ -143,13 +143,74 @@ window.customElements.define(
 
             const nowStr = new Date().toLocaleString();
 
-            // Build printable text. Many ESC/POS formatters support <qrcode> ... </qrcode>.
-            // If the printer plugin does not support QR, it will still print the payload text.
+            // Build printable text optimized for 80mm thermal printers
+            // 80mm printers typically support 48-50 characters per line
             const lines = [];
-            lines.push(`[C]<font size='big'><b>${business}</b></font>`);
-            lines.push(`[C]Date: ${nowStr}`);
+            
+            // Fixed configuration for 80mm printers (48 characters per line)
+            const TOTAL_COLS = 48;
+            const SEPARATOR = '[L]' + '-'.repeat(TOTAL_COLS);
+
+            // Helper to visually center a line by padding spaces to TOTAL_COLS
+            const centerLine = (raw) => {
+              const plain = String(raw).replace(/<[^>]*>/g, '');
+              const truncatedPlain = plain.length > TOTAL_COLS ? plain.slice(0, TOTAL_COLS) : plain;
+              const leftPad = Math.max(0, Math.floor((TOTAL_COLS - truncatedPlain.length) / 2));
+              return '[L]' + ' '.repeat(leftPad) + raw;
+            };
+            
+            // Business header centered
+            lines.push("<font size='big-2'><b> IMAPOS TESTER</b></font>");
             lines.push('');
-            lines.push('[L]--------------------------------');
+            lines.push(centerLine(`Date: ${nowStr}`));
+            lines.push(centerLine('No 80, New Shopping Complex,'));
+            lines.push(centerLine('Hingurakgoda')); 
+            lines.push(centerLine('Phone : 076 396 0566'));
+            lines.push('');
+            lines.push(SEPARATOR);
+            
+            // Get logged user information
+            let loggedUserName = 'Unknown';
+            try {
+              const sessionUser = sessionStorage.getItem('sessionUser');
+              if (sessionUser) {
+                const user = JSON.parse(sessionUser);
+                loggedUserName = user.name || user.username || 'User';
+              }
+            } catch (e) {
+              console.warn('Could not get logged user info:', e);
+            }
+            
+            // Get current bill number (if available from the page)
+            let currentBillNumber = 'N/A';
+            try {
+              // Try to get bill number from the current transaction context
+              const billNumberEl = document.querySelector('#currentBillNumber');
+              if (billNumberEl && billNumberEl.textContent) {
+                currentBillNumber = billNumberEl.textContent.trim();
+              } else if (window.currentBillNumber) {
+                // Get from global variable set after bill completion
+                currentBillNumber = window.currentBillNumber;
+              } else if (document.body.getAttribute('data-current-bill-number')) {
+                // Get from data attribute set after bill completion
+                currentBillNumber = document.body.getAttribute('data-current-bill-number');
+              } else {
+                // Generate a new bill number for this receipt
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const datePrefix = `${year}${month}${day}`;
+                const timestamp = Date.now().toString().slice(-6);
+                currentBillNumber = `${datePrefix}${timestamp}`;
+              }
+            } catch (e) {
+              console.warn('Could not get bill number:', e);
+            }
+            
+            lines.push(`Cashier : ${loggedUserName}`);
+            lines.push(`Invoice Number : ${currentBillNumber}`);
+            lines.push(SEPARATOR);
 
             // Cart items section (from current page cart cards)
             try {
@@ -166,15 +227,17 @@ window.customElements.define(
                   return s.length >= len ? s.slice(-len) : (' '.repeat(len - s.length) + s);
                 };
 
-                // Column widths tuned for 32-42 char printers
-                const COL_PRICE = 10;     // Price
-                const COL_DIS = 10;       // Dis Price (Our Price)
-                const COL_QTY = 5;        // Qty (e.g., x1)
-                const COL_TOTAL = 12;     // Total
+                // Optimized column widths for 80mm printers (48 chars total)
+                const COL_TOTAL = 12;  // Total column
+                const COL_QTY   = 6;   // Quantity column  
+                const COL_DIS   = 12;  // Discounted price column
+                const COL_PRICE = 12;  // Original price column
+                const COL_NAME  = TOTAL_COLS - (COL_TOTAL + COL_QTY + COL_DIS + COL_PRICE); // Remaining for item name
 
                 const makeDetailsRow = (price, disPrice, qty, total) => {
                   return (
                     '[L]'
+                    + ""
                     + padLeft(price, COL_PRICE)
                     + padLeft(disPrice, COL_DIS)
                     + padLeft(qty, COL_QTY)
@@ -182,11 +245,22 @@ window.customElements.define(
                   );
                 };
 
-                lines.push("[C]<font size='medium'><b>Items</b></font>");
-                lines.push('[L]--------------------------------');
-                // Header for details row
-                lines.push(makeDetailsRow('Price', 'Our Price', 'Qty', 'Total'));
-                lines.push('[L]--------------------------------');
+                // Build a single-line header like: Item  Price  Dis Price  Qty  Total
+                const makeHeaderRow = () => {
+                  const nameCol = padRight('Item', COL_NAME);
+                  return (
+                    '[L]'
+                    + nameCol
+                    + padLeft('Price', COL_PRICE)
+                    + padLeft('Dis Price', COL_DIS)
+                    + padLeft('Qty', COL_QTY)
+                    + padLeft('Total', COL_TOTAL)
+                  );
+                };
+
+                // Header row aligned to columns
+                lines.push(makeHeaderRow());
+                lines.push(SEPARATOR);
                 // Rows (two-line per item: name on top, details below)
                 cards.forEach((card) => {
                   const name = (card.dataset.itemName || '').toString();
@@ -194,7 +268,10 @@ window.customElements.define(
                   const priceNum = Number(card.dataset.price || '0');
                   const disPriceNum = Number(card.dataset.salePrice || card.dataset.price || '0');
                   const totalNum = Number(card.dataset.total || String(qtyNum * disPriceNum));
-                  lines.push('[L]<b>' + name + '</b>');
+                  
+                  // Truncate item name to fit 80mm width (48 chars)
+                  const truncatedName = name.length > TOTAL_COLS ? name.substring(0, TOTAL_COLS - 3) + '...' : name;
+                  lines.push('[L]<b>' + truncatedName + '</b>');
                   lines.push(makeDetailsRow(
                     priceNum.toFixed(2),
                     disPriceNum.toFixed(2),
@@ -203,7 +280,7 @@ window.customElements.define(
                   ));
                   lines.push('');
                 });
-                lines.push('[L]--------------------------------');
+                lines.push(SEPARATOR);
 
                 const grandTotalEl = document.querySelector('#grandTotal');
                 const itemCountEl = document.querySelector('#itemCount');
@@ -215,29 +292,57 @@ window.customElements.define(
                 const customerAmount = customerAmountEl ? Number(customerAmountEl.value || '0') : 0;
                 const balance = balanceEl ? Number((balanceEl.textContent || '0').trim()) : (grandTotal - customerAmount);
 
-                lines.push(`[R]Items count: ${itemCount}`);
-                lines.push(`[R]<font size='medium'><b>Grand Total: ${grandTotal.toFixed(2)}</b></font>`);
+                // Build explicit right-aligned lines using padding to TOTAL_COLS
+                const rightAlign = (text) => {
+                  const s = String(text ?? '');
+                  return '[L]' + (s.length >= TOTAL_COLS ? s.slice(-TOTAL_COLS) : (' '.repeat(TOTAL_COLS - s.length) + s));
+                };
+
+                // Render a label on the left and a value on the far right
+                const leftRight = (label, value) => {
+                  const left = String(label ?? '');
+                  const right = String(value ?? '');
+                  const available = TOTAL_COLS - left.length - right.length;
+                  const spaces = available > 1 ? available : 1;
+                  return '[L]' + left + ' '.repeat(spaces) + right;
+                };
+
+                lines.push(leftRight('Grand Total:', grandTotal.toFixed(2)));
+                lines.push(leftRight('Cash:', customerAmount.toFixed(2)));
                 if (!Number.isNaN(customerAmount) && customerAmount > 0) {
-                  lines.push(`[R]Balance: ${balance.toFixed(2)}`);
+                  lines.push(leftRight('Balance:', balance.toFixed(2)));
                 }
                 lines.push('');
               }
             } catch (e) {
               // If DOM not available, skip items
             }
-            lines.push('[C]--------------------------------');
-            lines.push("[C]<font size='medium'><b>Thank you!</b></font>");
-            lines.push("[C]<font size='medium'><b>System by ImaPOS</b></font>");
-            lines.push('\n');
-            lines.push('\n');
+            lines.push(SEPARATOR.replace('[L]', '[C]'));
+            lines.push(centerLine("<font size='medium'><b>Thank you for shopping with us!</b></font>"));
+            lines.push(centerLine("<font size='medium'><b>Hotline : 077 442 9053</b></font>"));
+            lines.push(centerLine("<font size='medium'><b>System by ImaPOS www.imapos.xyz</b></font>"));
+            lines.push('');
+            lines.push('');
+            lines.push("<font size='big-2'> </font>");
+            // Bottom feed: add a small margin at end of bill
+            const FEED_LINES = (function(){
+              const v = Number(localStorage.getItem('printerFeedLines'));
+              if (Number.isFinite(v) && v >= 0 && v <= 12) return Math.round(v);
+              return 4; // default
+            })();
+            for (let i = 0; i < FEED_LINES; i++) lines.push('');
 
-            const text = lines.join('\n');
+			const text = lines.join('\n');
 
-            plugin.printFormattedText({ type: 'usb', id: printerId, text }, function () {
-              setStatus('Printed successfully.');
-            }, function (err) {
-              setStatus('Print error: ' + JSON.stringify(err));
-            });
+			const payload = { type: 'usb', id: printerId, text };
+			const onSuccess = function () { setStatus('Printed successfully.'); };
+			const onError = function (err) { setStatus('Print error: ' + JSON.stringify(err)); };
+
+			if (typeof plugin.printFormattedTextAndCut === 'function') {
+				plugin.printFormattedTextAndCut(payload, onSuccess, onError);
+			} else {
+				plugin.printFormattedText(payload, onSuccess, onError);
+			}
 
           }, function (err) {
             setStatus('Permission denied: ' + JSON.stringify(err));

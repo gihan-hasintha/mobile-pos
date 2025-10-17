@@ -24,6 +24,8 @@ import {
   child,
   runTransaction
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-database.js";
+import { Capacitor } from "@capacitor/core";
+import { LocalNotifications } from "@capacitor/local-notifications";
 
 const categoriesCollection = collection(db, "categories");
 const itemsCollection = collection(db, "items");
@@ -497,8 +499,46 @@ async function handleCompleteBill() {
     const finalResult = { billId: billRef.key, billNumber };
 
     alert(`Bill #${finalResult.billNumber} saved and stock updated.`);
+    document.getElementById("print-usb-page").click();
     document.getElementById("bill-after-of-completed").style.display = "block";
     document.getElementById("bill-before-of-completed").style.display = "none";
+    
+    // Store the current bill number for the printer to access
+    document.body.setAttribute('data-current-bill-number', finalResult.billNumber);
+    window.currentBillNumber = finalResult.billNumber;
+
+    // Fire a local notification on Android/iOS (no-op on web)
+    try {
+      if (Capacitor.isNativePlatform && Capacitor.isNativePlatform()) {
+        // Ensure permission
+        const perm = await LocalNotifications.checkPermissions();
+        if (!perm || perm.display !== "granted") {
+          await LocalNotifications.requestPermissions();
+        }
+        // Ensure default channel on Android
+        await LocalNotifications.createChannel?.({
+          id: "imapos_default",
+          name: "ImaPOS",
+          description: "General notifications",
+          importance: 5
+        });
+        const notificationId = Number(String(Date.now()).slice(-6));
+        await LocalNotifications.schedule({
+          notifications: [
+            {
+              id: notificationId,
+              title: "Bill saved",
+              body: `Bill #${finalResult.billNumber} | Total: ${grandTotal.toFixed(2)}`,
+              smallIcon: "ic_launcher", // fallback to app icon
+              channelId: "imapos_default",
+              sound: undefined
+            }
+          ]
+        });
+      }
+    } catch (notifyErr) {
+      console.warn("Local notification failed:", notifyErr);
+    }
 
     // Update cached stock for offline accuracy
     if (window.updateCachedStock) {
@@ -565,4 +605,21 @@ function setupForms() {
 window.addEventListener("DOMContentLoaded", async () => {
   setupForms();
   await loadItems();
+  // Pre-initialize Local Notifications where supported
+  try {
+    if (Capacitor.isNativePlatform && Capacitor.isNativePlatform()) {
+      const perm = await LocalNotifications.checkPermissions();
+      if (!perm || perm.display !== "granted") {
+        await LocalNotifications.requestPermissions();
+      }
+      await LocalNotifications.createChannel?.({
+        id: "imapos_default",
+        name: "ImaPOS",
+        description: "General notifications",
+        importance: 5
+      });
+    }
+  } catch (e) {
+    console.warn("Failed to init Local Notifications:", e);
+  }
 }); 

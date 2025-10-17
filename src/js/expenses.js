@@ -22,7 +22,7 @@ async function loadRecentExpenses() {
     const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : new Date();
     card.innerHTML = `
       <div class="expense-title">${escapeHtml(data.title || "Untitled")}</div>
-      <div class="expense-sub">Amount: ${Number(data.amount || 0).toFixed(2)}${data.category ? ` | ${escapeHtml(data.category)}` : ""}</div>
+      <div class="expense-sub">Amount: ${formatAmount(data.amount)}${data.category ? ` | ${escapeHtml(data.category)}` : ""}</div>
       <div class="expense-time">${createdAt.toLocaleString()}</div>
       ${data.notes ? `<div class=\"expense-notes\">${escapeHtml(data.notes)}</div>` : ""}
     `;
@@ -64,6 +64,12 @@ function setupForm() {
 
 function escapeHtml(text) {
   return String(text).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+}
+
+function formatAmount(value) {
+  const num = Number(value || 0);
+  if (Number.isNaN(num)) return "0.00";
+  return num.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 window.addEventListener("DOMContentLoaded", async () => {

@@ -291,10 +291,10 @@ function calculateMetrics(data) {
 }
 
 // Number formatting function with comma separators
-function formatNumberWithCommas(value) {
+function formatNumberWithCommas(value, fractionDigits = 2) {
     return Number(value).toLocaleString('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
+        minimumFractionDigits: fractionDigits,
+        maximumFractionDigits: fractionDigits
     });
 }
 
@@ -417,7 +417,7 @@ function initializeChart() {
                     borderWidth: 1,
                     callbacks: {
                         label: function(context) {
-                            return 'Sales: LKR ' + context.parsed.y.toFixed(2);
+                            return 'Sales: LKR ' + formatNumberWithCommas(context.parsed.y, 2);
                         }
                     }
                 }
@@ -430,7 +430,7 @@ function initializeChart() {
                     },
                     ticks: {
                         callback: function(value) {
-                            return 'LKR ' + value.toFixed(0);
+                            return 'LKR ' + formatNumberWithCommas(value, 0);
                         }
                     }
                 },
@@ -558,9 +558,9 @@ function updateChartStats(chartData) {
     // Calculate growth (simplified - comparing with previous period)
     const growth = calculateGrowth();
     
-    document.getElementById('chartTotalSales').textContent = `LKR ${totalSales.toFixed(2)}`;
-    document.getElementById('chartAverageDaily').textContent = `LKR ${averageDaily.toFixed(2)}`;
-    document.getElementById('chartBestDay').textContent = `LKR ${bestDay.toFixed(2)}`;
+    document.getElementById('chartTotalSales').textContent = `LKR ${formatNumberWithCommas(totalSales, 2)}`;
+    document.getElementById('chartAverageDaily').textContent = `LKR ${formatNumberWithCommas(averageDaily, 2)}`;
+    document.getElementById('chartBestDay').textContent = `LKR ${formatNumberWithCommas(bestDay, 2)}`;
     
     const growthElement = document.getElementById('chartGrowth');
     growthElement.textContent = `${growth > 0 ? '+' : ''}${growth.toFixed(1)}%`;

@@ -12,20 +12,35 @@
   background: #ffffff;
   color: #000000;
   border-radius: 10px;
+  font-size: 13px;
   padding: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,.15);
 }
 
 .stock-item-name {
-    font-size: 18px;
+    font-size: 15px;
     padding-bottom: 7px;
 }
 
 .stock-status {
-    padding: 5px 9px;
+    padding: 6px 0px 0px 0px;
+    text-transform: uppercase;
     border-radius: 4px;
     margin-bottom: 10px;
     width: fit-content;
+    font-size: 13px;
+    display: block;
+    background-color: #f0f8ff3c;
+}
+
+.stock-status-of-item-in-stock-manage {
+    padding: 4px 6px;
+    padding-top: 7px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    width: fit-content;
+    font-size: 12px;
     display: block;
     background-color: #f0f8ff3c;
 }
@@ -44,6 +59,9 @@
 
 .stock-item-code {
     padding-bottom: 5px;
+    font-size: 14px;
+    color: #385dff;
+    text-transform: uppercase;
 }
 
 .stock-item-category {
@@ -57,6 +75,12 @@
 
 .stock-item-buying-price {
     display: none;
+}
+
+.searchbar-for-stock-manage-content-c-asdasdas-asd-23ksd-34kjasd-123asd {
+    position: fixed;
+    z-index: 99999;
+    width: 100%;
 }
 
 .searchbar-for-stock-manage-content-c {
@@ -82,5 +106,591 @@
 }
 
 .searchbar-for-stock-manage-content-c input::placeholder {
-    color: #ffffff8e;
+    color: #ffffffaa;
+}
+
+.searchbar-for-stock-manage-content-sd-content {
+    width: 92%;
+    margin: 0 auto;
+    display: flex;
+    gap: 6px;
+    padding-top: 4px;
+}
+
+.searchbar-for-stock-manage-content-sd-content select {
+    width: 100%;
+    background-color: #385dff;
+    color: white;
+}
+
+.loading-spinner {
+    text-align: center;
+    width: 100%;
+}
+
+.stock-items-grid-asdasd0-asdasd-dgse12-sad {
+    width: 100%;
+    position: fixed;
+}
+
+.excel-report-downloader-content {
+    width: 100%;
+    height: 100%;
+    background-color: #071240;
+    top: 0;
+    padding-top: 50px;
+    color: white;
+    z-index: 99999;
+    position: fixed;
+}
+
+.excel-report-downloader-content-title {
+    width: 90%;
+    text-align: center;
+    font-size: 15px;
+    margin: 0 auto;
+}
+
+.excel-report-downloader-content-title h1 {
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+    font-size: 24px;
+    padding-top: 14px;
+}
+
+.excel-report-downloader-content-bt {
+    width: 90%;
+    margin: 0 auto;
+    display: flex;
+    gap: 10px;
+    text-transform: uppercase;
+    align-items: center;
+}
+
+.excel-report-downloader-content-bt img {
+    width: 25px;
+}
+
+.excel-report-downloader-content-c {
+    width: 91%;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+.excel-report-downloader-content-c button {
+    height: 80px;
+    background-color: #0099e0;
+}
+
+.excel-report-downloader-content-c-close {
+    width: 40%;
+    padding-top: 20px;
+    margin: 0 auto;
+}
+
+.excel-report-downloader-content-c-close button {
+    background-color: #ffffff1a;
+    text-transform: uppercase;
+}
+
+.item-edit-details-window-content {
+    width: 100%;
+    height: 100%;
+    background-color: white;
+    position: fixed;
+    z-index: 99999999;
+}
+
+.form-actions-for-btns {
+    display: flex;
+    gap: 8px;
+    width: 92%;
+    margin: 0 auto;
+}
+
+.form-group label {
+    display: block;
+    padding-bottom: 10px;
+}
+
+.edit-item-form-content {
+    width: 92%;
+    margin: 0 auto;
+    padding-bottom: 10px;
+}
+
+.edit-item-form-content input,select {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    background-color: #00000008;
+    outline: none;
+    border: 1px solid #0000001e;
+}
+
+.modal-header {
+    width: 92%;
+    margin: 0 auto;
+}
+
+.item-clicked-to-show-details-of-selling-window-content-s {
+    width: 100%;
+    height: calc(100% - 50px);
+    top: 50px;
+    background-color: white;
+    overflow: auto;
+    position: fixed;
+    z-index: 99999999;
+}
+
+.selling-item {
+    width: 92%;
+    margin: 0 auto;
+    margin-bottom: 1px;
+}
+
+.item-details-header {
+    width: 92%;
+    margin: 0 auto;
+}
+
+.item-details-header h3 {
+    padding-bottom: 0px;
+    margin-bottom: 10px;
+}
+
+.item-details-info {
+    width: 92%;
+    margin: 0 auto;
+}
+
+.info-row-category {
+    padding-top: 5px;
+    font-size: 16px;
+    color: #e00000;
+    padding-bottom: 5px;
+}
+
+.stock-value-for-showing-datas {
+    color: #e33905;
+}
+
+.stock-value-for-showing-datas-total-sold {
+    color: #1d8805;
+}
+
+.stock-value-for-showing-datas-total-soldds {
+    font-size: 18px;
+    padding-top: 8px;
+}
+
+.stock-value-for-showing-datas-is {
+    font-size: 20px;
+    padding-top: 2px;
+    padding-bottom: 5px;
+}
+
+/* Selling history card */
+.selling-history {
+  width: 92%;
+  margin: 12px auto 18px auto;
+  background: #ffffff;
+  color: #000000;
+  border-radius: 10px;
+}
+
+.selling-history h4 {
+  margin: 0 0 10px 0;
+  font-size: 16px;
+}
+
+.selling-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Individual sale item */
+.selling-item {
+  background-color: #00000005;
+  border: 1px solid #00000014;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.sale-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.bill-number {
+  color: #385dff;
+  font-weight: 600;
+}
+
+.sale-date {
+  color: #666666;
+}
+
+.sale-details {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.sale-details .quantity {
+  color: #333333;
+}
+
+.sale-details .price {
+  color: #0a8f00;
+  font-weight: 600;
+}
+
+.sale-details .total {
+  margin-left: auto;
+  font-weight: 700;
+}
+
+.more-items {
+  text-align: center;
+  font-size: 12px;
+  color: #555555;
+  padding: 6px 0;
+}
+
+.no-sales {
+  text-align: center;
+  font-size: 13px;
+  color: #666666;
+  padding: 10px 0;
+}
+
+.delete-item-on-application-window-content {
+    width: 100%;
+    height: calc(100% - 50px);
+    background-color: white;
+    position: fixed;
+    z-index: 999999;
+}
+
+.modal-content-for-show-buttons {
+    width: 100%;
+    height: calc(100% - 50px);
+    position: fixed;
+    top: 50px;
+    background-color: white;
+    z-index: 99999;
+}
+
+.modal-content-for-show-buttons-buttons-content-asdsad {
+    display: grid;
+    width: 92%;
+    margin: 0 auto;
+    grid-template-columns: 1.2fr 1.2fr;
+    gap: 5px
+}
+
+.modal-content-for-show-buttons-buttons-content-asdsad button {
+    height: 150px;
+}
+
+.modal-content-for-show-buttons-buttons-content {
+    width: 90%;
+    margin: 0 auto;
+}
+
+.modal-content-for-show-buttons-buttons-content img {
+    width: 45px;
+    margin-bottom: 10px;
+}
+
+.show-pricing-history-onitem-window-content {
+    width: 100%;
+    height: calc(100% - 50px);
+    position: fixed;
+    top: 50px;
+    background-color: white;
+    z-index: 99999;
+}
+
+.show-pricing-history-onitem-window-content-sd {
+    width: 92%;
+    margin: 0 auto;
+}
+
+.show-pricing-history-onitem-window-content-sd input {
+    display: block;
+    width: 100%;
+    padding: 13px;
+    font-size: 12px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    border: none;
+    outline: none;
+    background-color: #00000005;
+    border: 1px solid #0000001f;
+}
+
+.show-pricing-history-onitem-window-content-sd button {
+    background-color: #002fff;
+    border: none;
+    outline: none;
+}
+
+.show-pricing-history-onitem-window-content-sd-buttons {
+    display: flex;
+    gap: 6px;
+}
+
+.show-pricing-history-onitem-window-content-sd-buttons button {
+    height: 48px;
+}
+
+.modal-content-for-show-buttons-buttons-content-asdsad-sd-content {
+    width: 92%;
+    margin: 0 auto;
+    padding-top: 10px;
+}
+
+.modal-content-for-show-buttons-buttons-content-asdsad-sd-content button {
+    background-color: #002fff;
+}
+
+.navigation-bar-for-application-head-content-right-button-sd {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.item-clicked-to-show-details-of-selling-window-button-for-hideitem button {
+    width: 45px;
+    height: 45px;
+    background-color: #002fff;
+    position: fixed;
+    z-index: 999999;
+    right: 28px;
+    bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 40px;
+}
+
+.item-clicked-to-show-details-of-selling-window-button-for-hideitem button img {
+    width: 25px;
+}
+
+.delete-item-on-application-window-content-sd {
+    width: 92%;
+    padding-top: 10px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+.delete-item-on-application-window-content-sd p {
+    padding-top: 0px;
+    margin-block-start: 0em;
+}
+
+.delete-item-on-application-window-content-sd-title {
+    font-size: 27px;
+    text-transform: uppercase;
+    padding-top: 20px;
+}
+
+.delete-item-on-application-window-content-sd-dis {
+    padding-bottom: 10px;
+    color: #40403f;
+}
+
+.delete-item-on-application-window-content-sd form select,input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background-color: #00000005;
+    border: 1px solid #0000001f;
+    border-radius: 4px;
+    height: 45px;
+}
+
+.delete-item-on-application-window-content-sd form input {
+    width: 100%;
+    height: 45px;
+    padding: 12px;
+}
+
+.delete-item-on-application-window-content-sd form button {
+    margin-top: 10px;
+}
+
+.delete-item-on-application-window-content-sd-dis-button {
+    display: flex;
+    gap: 7px;
+}
+
+#add-stock-form label {
+    display: block;
+    padding-bottom: 4px;
+    padding-left: 5px;
+    font-size: 14px;
+    padding-top: 10px;
+}
+
+.history-row {
+    width: 100%;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+/* Enhanced history card UI */
+.history-row {
+    background-color: #ffffff;
+    border: 1px solid #00000014;
+}
+
+.history-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.history-date {
+    font-weight: 600;
+    font-size: 13px;
+    color: #333333;
+}
+
+.history-qty {
+    background-color: #00000008;
+    border: 1px solid #00000014;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+}
+
+.history-row-body {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    font-size: 13px;
+}
+
+.history-row-body div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.history-chart-wrap {
+    height: 200px;
+}
+
+.price-trend {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    border-radius: 999px;
+    padding: 2px 6px;
+}
+
+.trend-up {
+    color: #0a8f00;
+    background-color: #0a8f0012;
+}
+
+.trend-down {
+    color: #c62828;
+    background-color: #c6282812;
+}
+
+.trend-flat {
+    color: #666666;
+    background-color: #66666612;
+}
+
+.modal-header-item-history-head {
+    justify-content: space-between;
+}
+
+.modal-header-item-history-head h2 {
+    font-size: 18px;
+    width: 75%;
+}
+
+.modal-header-item-history-head button {
+    width: fit-content;
+    height: 40px;
+    padding-left: 15px;
+    padding-right: 15px;
+    background-color: #ff5500;
+    font-size: 12px;
+}
+
+.modal-header-item-history-head button img {
+    width: 22px;
+}
+
+.history-list .history-row {
+    width: auto;
+    padding: 10px;
+}
+
+.stock-reports-showing-window {
+    width: 100%;
+    height: 45px;
+    display: flex;
+    margin-top: 5px;
+    padding-bottom: 7px;
+    align-items: center;
+    background-color: #002fff;
+    color: white;
+}
+
+.stock-reports-showing-window-content {
+    width: 92%;
+    padding-top: 2px;
+    margin: 0 auto;
+    gap: 7px;
+    overflow: auto;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+}
+
+.stock-reports-showing-window-content-button {
+    background-color: #ffffff2d;
+    padding: 10px;
+    padding-bottom: 8px;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+.stock-reports-showing-window-content::-webkit-scrollbar {
+    height: 0px;
+}
+
+.stock-reports-showing-window-content-button-content {
+    display: flex;
+    align-items: center;
+    display: flex;
+    gap: 5px;
+}
+
+.stock-reports-showing-window-content-button-title {
+    text-transform: uppercase;
+    font-size: 12px;
 }

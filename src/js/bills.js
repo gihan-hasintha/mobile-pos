@@ -106,8 +106,8 @@ async function showBill(billId, source = 'rtdb') {
     const itemsHtml = lines.map((l) => `
       <div class="bill-line">
         <div class="bill-line-title">${escapeHtml(l.name || l.itemId || "Item")}</div>
-        <div class="bill-line-sub">QNT: ${Number(l.quantity || 0)} | Price: ${Number(l.salePrice || 0).toFixed(2)}</div>
-        <div class="bill-line-total">Total: ${Number(l.total || (Number(l.quantity||0)*Number(l.salePrice||0))).toFixed(2)}</div>
+        <div class="bill-line-sub">QNT: ${Number(l.quantity || 0)} | Price: ${formatAmount(l.salePrice)}</div>
+        <div class="bill-line-total">Total: ${formatAmount(l.total || (Number(l.quantity||0)*Number(l.salePrice||0)))}</div>
       </div>
     `).join("");
 
@@ -115,7 +115,7 @@ async function showBill(billId, source = 'rtdb') {
       <div class="bill-detail-header">
         <div class="bill-detail-header-title"><strong>Bill #${billNumber}</strong></div>
         <div style="font-size: 13px;">${displayDate}</div>
-        <div>Items: ${Number(data.itemCount || 0)} | Grand Total: ${Number(data.grandTotal || 0).toFixed(2)}</div>
+        <div>Items: ${Number(data.itemCount || 0)} | Grand Total: ${formatAmount(data.grandTotal)}</div>
       </div>
       <div class="bill-lines">${itemsHtml}</div>
     `;
@@ -130,6 +130,12 @@ async function showBill(billId, source = 'rtdb') {
 
 function escapeHtml(text) {
   return String(text).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+}
+
+// Format numeric amounts with thousand separators and 2 decimals
+function formatAmount(value) {
+  const num = Number(value || 0);
+  return new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
 }
 
 // Parse RTDB-created human-readable createdAt like
@@ -159,7 +165,7 @@ function renderBills(list) {
     const billNumber = billData.billNumber || billData.id;
     card.innerHTML = `
       <div class="bill-card-title">Bill #${billNumber}</div>
-      <div class="bill-card-sub">Items: ${Number(billData.itemCount || 0)} | Total: ${Number(billData.grandTotal || 0).toFixed(2)}</div>
+      <div class="bill-card-sub">Items: ${Number(billData.itemCount || 0)} | Total: ${formatAmount(billData.grandTotal)}</div>
       <div class="bill-card-time">${displayDate}</div>
     `;
     container.appendChild(card);
@@ -200,7 +206,7 @@ function renderBillsGroupedByDate(list) {
       const billNumber = billData.billNumber || billData.id;
       card.innerHTML = `
         <div class="bill-card-title">Bill #${billNumber}</div>
-        <div class="bill-card-sub">Items: ${Number(billData.itemCount || 0)} | Total: ${Number(billData.grandTotal || 0).toFixed(2)}</div>
+        <div class="bill-card-sub">Items: ${Number(billData.itemCount || 0)} | Total: ${formatAmount(billData.grandTotal)}</div>
         <div class="bill-card-time">${displayDate}</div>
       `;
       container.appendChild(card);
@@ -401,7 +407,7 @@ function renderItemsView(list) {
     const dt = new Date(r.createdAtMs || 0).toLocaleString();
     card.innerHTML = `
       <div class="bill-card-title">${escapeHtml(String(r.itemName))}</div>
-      <div class="bill-card-sub">Qty: ${r.quantity} | Price: ${r.itemPrice.toFixed(2)}</div>
+      <div class="bill-card-sub">Qty: ${r.quantity} | Price: ${formatAmount(r.itemPrice)}</div>
       <div class="bill-card-sub">Cashier: ${escapeHtml(String(r.cashier))}</div>
       <div class="bill-card-time">${dt}</div>
       <div class="bill-card-link">Bill: <a href="#" data-bill-id="${r.billId}" class="bill-link">${escapeHtml(String(r.billNumber))}</a></div>
@@ -440,7 +446,7 @@ async function showItemDetail(itemKey, sourceList) {
   detail.innerHTML = `
     <div class="bill-detail-header">
       <div class="bill-detail-header-title"><strong>Item: ${escapeHtml(entry.name)}</strong></div>
-      <div>Total Qty: ${entry.totalQty} | Amount: ${entry.totalAmount.toFixed(2)}</div>
+      <div>Total Qty: ${entry.totalQty} | Amount: ${formatAmount(entry.totalAmount)}</div>
     </div>
     <div class="bill-lines">${rows}</div>
   `;

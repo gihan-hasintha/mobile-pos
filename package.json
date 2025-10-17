@@ -1,11 +1,18 @@
 {
-  "name": "capacitor-app",
+  "name": "imapos",
   "version": "1.0.0",
-  "description": "An Amazing Capacitor App",
+  "description": "ImaPOS is a Sri Lankan POS system specially designed for mobile devices",
   "main": "index.js",
   "keywords": [
-    "capacitor",
-    "mobile"
+    "ImaPOS",
+    "mobile",
+    "POS",
+    "Imagini",
+    "Sri Lanka",
+    "POS system",
+    "POS system for mobile devices",
+    "POS system for Sri Lanka",
+    "POS system for mobile devices in Sri Lanka"
   ],
   "scripts": {
     "start": "vite",
@@ -16,7 +23,9 @@
     "@capacitor/android": "^7.4.3",
     "@capacitor/camera": "latest",
     "@capacitor/core": "latest",
+    "@capacitor/filesystem": "^7.1.4",
     "@capacitor/ios": "^7.4.3",
+    "@capacitor/local-notifications": "^7.0.3",
     "@capacitor/splash-screen": "latest",
     "@capacitor/status-bar": "^7.0.3",
     "bthrust-thermal-printer-cordova-plugin": "^1.0.9"

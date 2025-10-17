@@ -28,6 +28,27 @@
   <body>
     <capacitor-welcome></capacitor-welcome>
 
+    <div id="login-for-application-main">
+      <div class="login-for-application-main-content">
+        <div class="login-for-application-main-content-sd">
+          <div class="login-for-application-main-content-sd-title">
+            SYSTEM LOGIN
+          </div>
+          <form id="login-form">
+            <select id="role-select" style="margin-bottom: 2px;">
+              <option value="cashier">Cashier</option>
+              <option value="admin">Admin</option>
+            </select>
+            <select id="user-select">
+              <option value="">Select cashier or admin</option>
+            </select>
+            <input id="pin-input" type="password" placeholder="Enter pin">
+            <button type="submit" style="margin-top: 7px;">Login</button>
+        </form>
+        </div>
+      </div>
+    </div>
+
     <div id="navigation-bar-for-application-head">
       <div class="navigation-bar-for-application-head-navbar">
         <div class="navigation-bar-for-application-head-content">
@@ -66,6 +87,7 @@
     </div>
 
     <section>
+      
       <div class="home-page-item-grids-and-category-showing-on-page">
         <div class="home-page-item-grids-and-category-showing-on-page-asdasd-asdkas-asd">
           <div class="category-buttons-content">
@@ -73,6 +95,9 @@
           </div>
         </div>
         <div class="home-page-item-grids-and-category-showing-on-page-asdasd-asdkas-asd-space"></div>
+        
+        <div id="logged-account-details-shower" style="display: none;">Logged as a cashier</div>
+        
           <div id="items-grid"></div>
           <div class="home-page-item-grids-and-category-showing-on-page-asdasd-asdkas-asd-space-asdpasdksad"></div>
       </div>
@@ -108,7 +133,7 @@
       <h2>USB Thermal Printer (Page)</h2>
       <p>
         <button id="list-usb-page">List USB Printers</button>
-        <button id="print-usb-page">Print Test (USB)</button>
+        <button >Print Test (USB)</button>
       </p>
       <div>
         <h3>Printers</h3>
@@ -146,7 +171,7 @@
             <div class="bill-final-confirmation-window-content-bill-info-buttons">
               <div class="bill-final-confirmation-window-content-bill-info-buttons-double" style="padding-bottom: 8px;">
                 <button style="background-color: #FF3232;" onclick="closefirstageofbillwindow()">Close</button>
-                <button style="background-color: #E78B00;">Print Receipt</button>
+                <button id="print-usb-page" style="background-color: #E78B00;display: none;">Print Receipt</button>
               </div>
               <div class="bill-final-confirmation-window-content-bill-info-buttons-single">
                 <button id="completeBill" style="background-color: #00C936;">Complete</button>
@@ -157,13 +182,19 @@
           <div id="bill-after-of-completed" style="display: none;">
             <div class="bill-final-confirmation-window-content-bill-info-buttons">
               <div class="bill-final-confirmation-window-content-bill-info-buttons-double" style="padding-bottom: 8px;">
-                <button style="background-color: #E78B00;">RePrint Receipt</button>
+                <button style="background-color: #E78B00;" onclick="reprintrespitforgivetocustomerusingdb()">RePrint Receipt</button>
               </div>
               <div class="bill-final-confirmation-window-content-bill-info-buttons-single">
                 <button id="completeBill" style="background-color: #00A7DF;" onclick="applicatiobillsnnextbillskippingbutton()">Next Bill</button>
               </div>
             </div>
           </div>
+
+          <script>
+            function reprintrespitforgivetocustomerusingdb() {
+              document.getElementById("print-usb-page").click();
+            }
+          </script>
 
           <div class="bill-final-confirmation-window-content-bill-info-title">
             Customer Loyality
@@ -213,6 +244,8 @@
     function applicatiobillsnnextbillskippingbutton() {
       document.getElementById("nextBill").click();
       document.getElementById("bill-final-confirmation-window").style.display = "none";
+      document.getElementById("bill-after-of-completed").style.display = "none";
+      document.getElementById("bill-before-of-completed").style.display = "block";
     }
   </script>
 
@@ -254,6 +287,138 @@
 
 
   </div>
+
+  <script type="module">
+    import { db } from "./js/firebase_config.js";
+    import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+    const loginContainer = document.getElementById("login-for-application-main");
+    const roleSelect = document.getElementById("role-select");
+    const userSelect = document.getElementById("user-select");
+    const pinInput = document.getElementById("pin-input");
+    const loginForm = document.getElementById("login-form");
+    const loggedInfoEl = document.getElementById("logged-account-details-shower");
+    const logoutBtn = document.getElementById("logout-button");
+
+    let currentUsers = [];
+
+    async function loadUsersByRole(role) {
+      userSelect.innerHTML = '<option value="">Loading...</option>';
+      currentUsers = [];
+      try {
+        const usersRef = collection(db, "users");
+        const q = role ? query(usersRef, where("role", "==", role)) : usersRef;
+        const snap = await getDocs(q);
+
+        currentUsers = snap.docs.map(d => ({ id: d.id, ...(d.data() || {}) }));
+        // sort by name or username if available
+        currentUsers.sort((a,b) => String(a.name||a.username||"").localeCompare(String(b.name||b.username||"")));
+
+        userSelect.innerHTML = '<option value="">Select ' + (role || 'user') + '</option>';
+        currentUsers.forEach(u => {
+          const label = u.name || u.username || u.phone || u.id;
+          const opt = document.createElement("option");
+          opt.value = u.id;
+          opt.textContent = label;
+          userSelect.appendChild(opt);
+        });
+      } catch (err) {
+        console.error("Error loading users:", err);
+        userSelect.innerHTML = '<option value="">Failed to load users</option>';
+      }
+    }
+
+    // Restore session if available (sessionStorage clears on app close)
+    try {
+      const existing = sessionStorage.getItem("sessionUser");
+      if (existing) {
+        const user = JSON.parse(existing);
+        if (loginContainer) loginContainer.style.display = "none";
+        if (loggedInfoEl) {
+          const roleLabel = String(user.role || "").toLowerCase();
+          const nameLabel = user.name ? ` - ${user.name}` : "";
+          loggedInfoEl.textContent = `Logged as ${roleLabel}${nameLabel}`;
+        }
+        if (logoutBtn) logoutBtn.style.display = "inline-block";
+      }
+    } catch {}
+
+    // Initial load for default role (cashier)
+    loadUsersByRole(roleSelect.value);
+
+    roleSelect.addEventListener("change", () => {
+      loadUsersByRole(roleSelect.value);
+    });
+
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const selectedId = userSelect.value;
+      const enteredPin = String(pinInput.value || "").trim();
+      if (!selectedId) {
+        alert("Please select a user");
+        return;
+      }
+      const selectedUser = currentUsers.find(u => u.id === selectedId);
+      if (!selectedUser) {
+        alert("User not found");
+        return;
+      }
+      const expectedPin = String(selectedUser.pin || "").trim();
+      if (enteredPin && expectedPin && enteredPin === expectedPin) {
+        // success: hide login
+        if (loginContainer) loginContainer.style.display = "none";
+        // remember session for this tab only
+        try {
+          const sess = {
+            id: selectedUser.id,
+            name: selectedUser.name || selectedUser.username || "",
+            role: selectedUser.role || "",
+            phone: selectedUser.phone || ""
+          };
+          sessionStorage.setItem("sessionUser", JSON.stringify(sess));
+          if (loggedInfoEl) {
+            const roleLabel = String(sess.role || "").toLowerCase();
+            const nameLabel = sess.name ? ` - ${sess.name}` : "";
+            loggedInfoEl.textContent = `Logged as ${roleLabel}${nameLabel}`;
+          }
+          if (logoutBtn) logoutBtn.style.display = "inline-block";
+        } catch {}
+      } else {
+        alert("Invalid PIN");
+      }
+    });
+
+    // Logout handler (clears saved session and resets UI)
+    function doLogout() {
+      try { sessionStorage.removeItem("sessionUser"); } catch {}
+      if (loggedInfoEl) {
+        loggedInfoEl.textContent = "";
+        loggedInfoEl.style.display = "none";
+      }
+      if (logoutBtn) logoutBtn.style.display = "none";
+      if (loginContainer) loginContainer.style.display = "block";
+      if (pinInput) pinInput.value = "";
+      if (roleSelect) roleSelect.value = "cashier";
+      loadUsersByRole(roleSelect.value);
+    }
+
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", doLogout);
+    }
+    // Expose for sidebar "Logout" card
+    window.logoutonapplication = doLogout;
+
+    // Proactive: clear session if any explicit logout navigation is clicked
+    document.addEventListener("click", (e) => {
+      const t = e.target instanceof Element ? e.target : null;
+      if (!t) return;
+      const link = t.closest('a[href$="access_manage.html"], a[href$="/access_manage.html"]');
+      if (link) {
+        try { sessionStorage.removeItem("sessionUser"); } catch {}
+        doLogout();
+      }
+    });
+  </script>
 
   <script type="module">
     import { rtdb } from "./js/firebase_config.js";
@@ -820,6 +985,7 @@
             </a>
 
           </div>
+
           <div class="application-sideba-for-manage-content-card-layout">
 
             <div class="application-sideba-for-manage-content-card-layout-card" onclick="showaddandmanagecategoriesanditems()">
@@ -847,6 +1013,67 @@
             </a>
 
           </div>
+
+          <div class="application-sideba-for-manage-content-card-layout" style="display: none;">
+
+            <a href="./stock_history1.html">
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/history_2_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    Stock History
+                  </div>
+                </div>
+              </div>
+            </a>
+
+            <a>
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/power_settings_circle_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    asdasd
+                  </div>
+                </div>
+              </div>
+            </a>
+
+          </div>
+
+          <div class="application-sideba-for-manage-content-card-layout">
+
+            <a href="./stock_history.html">
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/history_2_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    Stock History
+                  </div>
+                </div>
+              </div>
+            </a>
+
+            <a id="logout-button">
+              <div class="application-sideba-for-manage-content-card-layout-card">
+                <div class="application-sideba-for-manage-content-card-layout-content">
+                  <div class="application-sideba-for-manage-content-card-layout-img">
+                    <img src="./assets/imgs/power_settings_circle_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+                  </div>
+                  <div class="application-sideba-for-manage-content-card-layout-txt">
+                    Logout
+                  </div>
+                </div>
+              </div>
+            </a>
+
+          </div>
+
           <div class="space-f0r-card-sectionsd0sdas-asdas"></div>
         </div>
       </div>
@@ -911,123 +1138,6 @@
         <div class="navigation-bar-for-application-head-navbar-space"></div>
       </div>
     
-      <div id="application-sideba-for-manage" style="display: block;">
-        <div id="application-sideba-for-manage-div">
-          <div class="application-sideba-for-manage-content">
-            <div class="application-sideba-for-manage-content-card-layout">
-    
-              <a href="./expenses.html">
-                <div class="application-sideba-for-manage-content-card-layout-card">
-                  <div class="application-sideba-for-manage-content-card-layout-content">
-                    <div class="application-sideba-for-manage-content-card-layout-img">
-                      <img src="./assets/imgs/receipt_long_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
-                    </div>
-                    <div class="application-sideba-for-manage-content-card-layout-txt">
-                      ADD expenses
-                    </div>
-                  </div>
-                </div>
-              </a>
-    
-              <a href="./sales_summary.html">
-                <div class="application-sideba-for-manage-content-card-layout-card">
-                  <div class="application-sideba-for-manage-content-card-layout-content">
-                    <div class="application-sideba-for-manage-content-card-layout-img">
-                      <img src="./assets/imgs/finance_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
-                    </div>
-                    <div class="application-sideba-for-manage-content-card-layout-txt">
-                      Sales Summary
-                    </div>
-                  </div>
-                </div>
-              </a>
-    
-            </div>
-    
-            <div class="application-sideba-for-manage-content-card-layout">
-    
-              <a href="./returns.html">
-                <div class="application-sideba-for-manage-content-card-layout-card">
-                <div class="application-sideba-for-manage-content-card-layout-content">
-                  <div class="application-sideba-for-manage-content-card-layout-img">
-                    <img src="./assets/imgs/repeat_on_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
-                  </div>
-                  <div class="application-sideba-for-manage-content-card-layout-txt">
-                    Item Return
-                  </div>
-                </div>
-                </div>
-              </a>
-    
-              <div class="application-sideba-for-manage-content-card-layout-card">
-                <div class="application-sideba-for-manage-content-card-layout-content">
-                  <div class="application-sideba-for-manage-content-card-layout-img">
-                    <img src="./assets/imgs/shelves_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
-                  </div>
-                  <div class="application-sideba-for-manage-content-card-layout-txt">
-                    Stock Manage
-                  </div>
-                </div>
-              </div>
-    
-            </div>
-    
-            <div class="application-sideba-for-manage-content-card-layout">
-    
-              <div class="application-sideba-for-manage-content-card-layout-card">
-                <div class="application-sideba-for-manage-content-card-layout-content">
-                  <div class="application-sideba-for-manage-content-card-layout-img">
-                    <img src="./assets/imgs/receipt_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
-                  </div>
-                  <div class="application-sideba-for-manage-content-card-layout-txt">
-                    Total Bill's
-                  </div>
-                </div>
-              </div>
-    
-              <div class="application-sideba-for-manage-content-card-layout-card">
-                <div class="application-sideba-for-manage-content-card-layout-content">
-                  <div class="application-sideba-for-manage-content-card-layout-img">
-                    <img src="./assets/imgs/identity_platform_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
-                  </div>
-                  <div class="application-sideba-for-manage-content-card-layout-txt">
-                    Access Manage
-                  </div>
-                </div>
-              </div>
-    
-            </div>
-            <div class="application-sideba-for-manage-content-card-layout">
-    
-              <div class="application-sideba-for-manage-content-card-layout-card">
-                <div class="application-sideba-for-manage-content-card-layout-content">
-                  <div class="application-sideba-for-manage-content-card-layout-img">
-                    <img src="./assets/imgs/add_diamond_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
-                  </div>
-                  <div class="application-sideba-for-manage-content-card-layout-txt">
-                    ADD items and categories
-                  </div>
-                </div>
-              </div>
-    
-              <a href="./customers.html">
-                <div class="application-sideba-for-manage-content-card-layout-card">
-                  <div class="application-sideba-for-manage-content-card-layout-content">
-                    <div class="application-sideba-for-manage-content-card-layout-img">
-                      <img src="./assets/imgs/loyalty_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
-                    </div>
-                    <div class="application-sideba-for-manage-content-card-layout-txt">
-                      Customers
-                    </div>
-                  </div>
-                </div>
-              </a>
-
-            </div>
-            <div class="space-f0r-card-sectionsd0sdas-asdas"></div>
-          </div>
-        </div>
-      </div>
       <main>
         <div class="items-and-categories-creataing-window">
           <div class="items-and-categories-creataing-window-space-switch-hjh">
@@ -1070,13 +1180,13 @@
                 <input type="text" id="item-code" placeholder="e.g. SKU-0001" required>
   
                 <label for="item-price">Item Price</label>
-                <input type="number" id="item-price" step="100" min="0" placeholder="0.00" required>
+                <input type="number" id="item-price" step="10" min="0" placeholder="0.00" required>
   
                 <label for="item-buying-price">Buying Price (optional)</label>
-                <input type="number" id="item-buying-price" step="100" min="0" placeholder="0.00">
+                <input type="number" id="item-buying-price" step="10" min="0" placeholder="0.00">
   
                 <label for="item-discount-price">Discount Price (Selling Price)</label>
-                <input type="number" id="item-discount-price" step="100" min="0" placeholder="0.00" required>
+                <input type="number" id="item-discount-price" step="10" min="0" placeholder="0.00" required>
   
                 <label for="item-stock">Item Stock</label>
                 <input type="number" id="item-stock" step="1" min="0" placeholder="0" required>
