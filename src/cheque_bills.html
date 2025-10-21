@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cheque Bills</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <div id="navigation-bar-for-application-head">
+    <div class="navigation-bar-for-application-head-navbar">
+      <div class="navigation-bar-for-application-head-content">
+        <div class="navigation-bar-for-application-head-content-left" onclick="history.back()">
+          <div class="navigation-bar-for-application-head-content-right-button">
+            <img src="./assets/imgs/keyboard_backspace_50dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+          </div>
+        </div>
+        <div class="navigation-bar-for-application-head-content-center">
+          <div class="navbar-app-LOGO-img">
+            <img src="./assets/imgs/IMAPOS_LOGO.png" alt="">
+          </div>
+        </div>
+        <div class="navigation-bar-for-application-head-content-right">
+          <div class="navigation-bar-for-application-head-content-right-c">
+            <div class="navigation-bar-for-application-head-content-right-button" id="toggleFiltersBtn">
+              <img src="./assets/imgs/dashboard_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="navigation-bar-for-application-head-navbar-space"></div>
+  </div>
+
+  <div id="item-or-bills-showing-terminal-window-navbar" style="display: block;">
+    <div class="item-or-bills-showing-terminal-window-navbar-s" style="top: 40px;">
+      <div class="item-or-bills-showing-terminal-window-navbar-content">
+        <div class="item-or-bills-showing-terminal-window-navbar-left">
+          <div class="item-or-bills-showing-terminal-window-navbar-content-txt">Filters</div>
+          <select id="billFilter">
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="thisWeek">This week</option>
+            <option value="thisMonth">This month</option>
+            <option value="all">All time</option>
+          </select>
+        </div>
+        <div class="item-or-bills-showing-terminal-window-navbar-right">
+          <div class="item-or-bills-showing-terminal-window-navbar-content-txt">Actions</div>
+          <button id="exportBtn">Export to Excel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main style="padding-top: 20px;">
+    <div class="bill-page-bills-container-space-wc-container">
+      <div id="billsContainer" class="bills-container"></div>
+    </div>
+  </main>
+
+  <script>
+    (function(){
+      const btn = document.getElementById('toggleFiltersBtn');
+      const navbar = document.getElementById('item-or-bills-showing-terminal-window-navbar');
+      let hideTimer = null;
+      if (btn && navbar) {
+        btn.addEventListener('click', () => {
+          const visible = window.getComputedStyle(navbar).display !== 'none';
+          if (visible) {
+            navbar.style.display = 'none';
+            if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+          } else {
+            navbar.style.display = 'block';
+            if (hideTimer) { clearTimeout(hideTimer); }
+            hideTimer = setTimeout(() => { navbar.style.display = 'none'; hideTimer = null; }, 5000);
+          }
+        });
+      }
+    })();
+  </script>
+
+  <script type="module" src="./js/firebase_config.js"></script>
+  <script type="module" src="./js/cheque_bills.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,26 @@
+.add-expenses-form-div-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+.add-expenses-form-div-content button {
+    width: fit-content;
+    padding-left: 17px;
+    height: 40px;
+    font-size: 12px;
+    padding-right: 17px;
+}
+
+.items-and-categories-creataing-window-space-switch-hjh-txt {
+    width: 100%;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 20px;
+    padding-bottom: 20px;
+}
+
+.add-expenses-form-div-content-left input {
+    font-size: 12px;
+    padding: 20px;
+}

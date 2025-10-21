@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Enter Day Cash</title>
+	<link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+	<div id="navigation-bar-for-application-head">
+		<div class="navigation-bar-for-application-head-navbar">
+			<div class="navigation-bar-for-application-head-content">
+				<div class="navigation-bar-for-application-head-content-left" onclick="showcartlistoncashieraddedtocart()">
+						<div class="navigation-bar-for-application-head-content-right-button" onclick="history.back()">
+							<img src="./assets/imgs/keyboard_backspace_50dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+						</div>
+				</div>
+				<div class="navigation-bar-for-application-head-content-center">
+					<div class="navbar-app-LOGO-img">
+						<img src="./assets/imgs/IMAPOS_LOGO.png" alt="">
+					</div>
+				</div>
+				<div class="navigation-bar-for-application-head-content-right">
+					<div class="navigation-bar-for-application-head-content-right-c">
+						<div class="navigation-bar-for-application-head-content-right-button" id="navigation-bar-for-application-head-content-right-button-close-searchbar-show" style="display: none;" onclick="openSearchModal()">
+							<img src="./assets/imgs/search-interface-symbol.png" alt="">
+						</div>
+
+						<div class="navigation-bar-for-application-head-content-right-button" id="navigation-bar-for-application-head-content-right-button-close-searchbar" style="display: none;" onclick="closeSearchModal()">
+							<img src="./assets/imgs/close_50dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+						</div>
+
+						<div class="navigation-bar-for-application-head-content-right-button" onclick="openmenubaronapplication()">
+							<img src="./assets/imgs/menu_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="navigation-bar-for-application-head-navbar-space"></div>
+	</div>
+
+	<div id="application-sideba-for-manage" style="display: block;">
+		<div id="application-sideba-for-manage-div">
+			<div class="application-sideba-for-manage-content">
+				<div class="application-sideba-for-manage-content-card-layout">
+					<a href="./expenses.html">
+						<div class="application-sideba-for-manage-content-card-layout-card">
+							<div class="application-sideba-for-manage-content-card-layout-content">
+								<div class="application-sideba-for-manage-content-card-layout-img">
+									<img src="./assets/imgs/receipt_long_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+								</div>
+								<div class="application-sideba-for-manage-content-card-layout-txt">
+									ADD expenses
+								</div>
+							</div>
+						</div>
+					</a>
+
+					<a href="./sales_summary.html">
+						<div class="application-sideba-for-manage-content-card-layout-card">
+							<div class="application-sideba-for-manage-content-card-layout-content">
+								<div class="application-sideba-for-manage-content-card-layout-img">
+									<img src="./assets/imgs/finance_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+								</div>
+								<div class="application-sideba-for-manage-content-card-layout-txt">
+									Sales Summary
+								</div>
+							</div>
+						</div>
+					</a>
+				</div>
+
+				<div class="application-sideba-for-manage-content-card-layout">
+					<div class="application-sideba-for-manage-content-card-layout-card">
+						<div class="application-sideba-for-manage-content-card-layout-content">
+							<div class="application-sideba-for-manage-content-card-layout-img">
+								<img src="./assets/imgs/repeat_on_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+							</div>
+							<div class="application-sideba-for-manage-content-card-layout-txt">
+								Item Return
+							</div>
+						</div>
+					</div>
+
+					<div class="application-sideba-for-manage-content-card-layout-card">
+						<div class="application-sideba-for-manage-content-card-layout-content">
+							<div class="application-sideba-for-manage-content-card-layout-img">
+								<img src="./assets/imgs/shelves_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+							</div>
+							<div class="application-sideba-for-manage-content-card-layout-txt">
+								Stock Manage
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="application-sideba-for-manage-content-card-layout">
+					<div class="application-sideba-for-manage-content-card-layout-card">
+						<div class="application-sideba-for-manage-content-card-layout-content">
+							<div class="application-sideba-for-manage-content-card-layout-img">
+								<img src="./assets/imgs/receipt_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+							</div>
+							<div class="application-sideba-for-manage-content-card-layout-txt">
+								Total Bill's
+							</div>
+						</div>
+					</div>
+
+					<a href="./access_manage.html">
+						<div class="application-sideba-for-manage-content-card-layout-card">
+							<div class="application-sideba-for-manage-content-card-layout-content">
+								<div class="application-sideba-for-manage-content-card-layout-img">
+									<img src="./assets/imgs/identity_platform_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+								</div>
+								<div class="application-sideba-for-manage-content-card-layout-txt">
+									Access Manage
+								</div>
+							</div>
+						</div>
+					</a>
+				</div>
+
+				<div class="application-sideba-for-manage-content-card-layout">
+					<a href="./day_cash_entries.html">
+						<div class="application-sideba-for-manage-content-card-layout-card">
+							<div class="application-sideba-for-manage-content-card-layout-content">
+								<div class="application-sideba-for-manage-content-card-layout-img">
+									<img src="./assets/imgs/account_balance_wallet_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+								</div>
+								<div class="application-sideba-for-manage-content-card-layout-txt">
+									Day Cash Entries
+								</div>
+							</div>
+						</div>
+					</a>
+				</div>
+
+				<div class="application-sideba-for-manage-content-card-layout">
+					<div class="application-sideba-for-manage-content-card-layout-card">
+						<div class="application-sideba-for-manage-content-card-layout-content">
+							<div class="application-sideba-for-manage-content-card-layout-img">
+								<img src="./assets/imgs/add_diamond_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+							</div>
+							<div class="application-sideba-for-manage-content-card-layout-txt">
+								ADD items and categories
+							</div>
+						</div>
+					</div>
+
+					<a href="./customers.html">
+						<div class="application-sideba-for-manage-content-card-layout-card">
+							<div class="application-sideba-for-manage-content-card-layout-content">
+								<div class="application-sideba-for-manage-content-card-layout-img">
+									<img src="./assets/imgs/loyalty_100dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="">
+								</div>
+								<div class="application-sideba-for-manage-content-card-layout-txt">
+									Customers
+								</div>
+							</div>
+						</div>
+					</a>
+				</div>
+				<div class="space-f0r-card-sectionsd0sdas-asdas"></div>
+			</div>
+		</div>
+	</div>
+
+	<main>
+		<div class="items-and-categories-creataing-window-space-switch-hjh">
+		</div>
+
+		<div class="add-expenses-form-div">
+			<div id="enter-day-cash-form-wrapper">
+				<h2 style="text-align: center;text-transform: uppercase;">Cashier Day Start/End</h2>
+				<form id="day-cash-form" class="expense-form">
+					<input type="text" id="logged-user-name" placeholder="Logged user name" required readonly>
+					<input type="number" id="cashier-amount" placeholder="Cashier has amount (LKR)" step="0.01" min="0" required>
+					<div class="expense-sub" style="margin-top: 8px;">Today's Summary</div>
+					<div class="expense-card" style="padding-bottom: 12px;padding-top: 12px;">
+						<div style="font-size: 15px;padding-bottom: 8px;">Total bills: <span id="summary-total-bills">0</span></div>
+						<div style="font-size: 15px;padding-bottom: 8px;">Sold items count: <span id="summary-items-count">0</span></div>
+						<div style="font-size: 15px;padding-bottom: 2px;">Sold bills total amount: LKR <span id="summary-bills-amount">0.00</span></div>
+						<div style="margin-top: 10px; padding: 8px; background-color: #c9d3da29; border-radius: 4px;font-size: 13px;">
+							Today entries total: LKR <span id="summary-entries-total">0.00</span>
+						</div>
+						<div style="margin-top: 5px; padding: 8px; background-color: #c9d3da29; border-radius: 4px; color: #3af443;font-size: 13px;">
+							Amount to save: LKR <span id="summary-amount-to-save">0.00</span>
+						</div>
+					</div>
+					<button type="submit" id="save-day-cash-btn">Save</button>
+				</form>
+			</div>
+
+			<h2 style="text-align: center;text-transform: uppercase;">Today Entries</h2>
+			<div id="dayCashList" class="expenses-list"></div>
+		</div>
+	</main>
+
+	<script>
+		function openmenubaronapplication() {
+			const el = document.getElementById("application-sideba-for-manage-div");
+			const currentLeft = window.getComputedStyle(el).left;
+			el.style.left = (currentLeft === "0px" || currentLeft === "0") ? "2050px" : "0";
+		}
+	</script>
+
+	<script type="module" src="./js/firebase_config.js"></script>
+	<script type="module" src="./js/day_cash.js"></script>
+</body>
+</html>
+

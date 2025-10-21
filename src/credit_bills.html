@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Bills</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <div id="navigation-bar-for-application-head">
+    <div class="navigation-bar-for-application-head-navbar">
+      <div class="navigation-bar-for-application-head-content">
+        <div class="navigation-bar-for-application-head-content-left" onclick="history.back()">
+          <div class="navigation-bar-for-application-head-content-right-button">
+            <img src="./assets/imgs/keyboard_backspace_50dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+          </div>
+        </div>
+        <div class="navigation-bar-for-application-head-content-center">
+          <div class="navbar-app-LOGO-img">
+            <img src="./assets/imgs/IMAPOS_LOGO.png" alt="">
+          </div>
+        </div>
+        <div class="navigation-bar-for-application-head-content-right">
+          <div class="navigation-bar-for-application-head-content-right-c">
+            <div class="navigation-bar-for-application-head-content-right-button" id="toggleFiltersBtn">
+              <img src="./assets/imgs/dashboard_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="navigation-bar-for-application-head-navbar-space"></div>
+  </div>
+
+  <div id="item-or-bills-showing-terminal-window-navbar" style="display: block;">
+    <div class="item-or-bills-showing-terminal-window-navbar-s" style="top: 40px;">
+      <div class="item-or-bills-showing-terminal-window-navbar-content">
+        <div class="item-or-bills-showing-terminal-window-navbar-left">
+          <div class="item-or-bills-showing-terminal-window-navbar-content-txt">Filters</div>
+          <select id="billFilter">
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="thisWeek">This week</option>
+            <option value="thisMonth">This month</option>
+            <option value="all">All time</option>
+          </select>
+        </div>
+        <div class="item-or-bills-showing-terminal-window-navbar-right">
+          <div class="item-or-bills-showing-terminal-window-navbar-content-txt">Actions</div>
+          <button id="exportBtn">Export to Excel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main style="padding-top: 20px;">
+    <div class="bill-page-bills-container-space-wc-container">
+      <div id="billsContainer" class="bills-container"></div>
+    </div>
+  </main>
+
+  <!-- Payment Modal -->
+  <div id="creditPayModal" style="display: none;">
+    <div id="creditPayModalBackdrop" class="bills-data-showing-window-content">
+      <div class="bills-data-showing-window-content-modal">
+        <div class="bills-data-showing-window-content-modal-header">
+          <div class="bills-data-showing-window-content-modal-header-content">
+            <h3>Record Payment</h3>
+            <button id="closeCreditPayModal" class="close-btn">&times;</button>
+          </div>
+        </div>
+        <div class="bill-detail">
+          <div style="margin-bottom:10px; font-weight:600;" id="creditPayBillLabel">Bill</div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end;">
+            <div style="flex:1; min-width:180px;">
+              <label for="creditPayCurrentBalance" style="display:block; font-size:12px; opacity:.8;">Current Balance</label>
+              <input id="creditPayCurrentBalance" type="text" readonly>
+            </div>
+            <div style="flex:1; min-width:180px;">
+              <label for="creditPayAmount" style="display:block; font-size:12px; opacity:.8;">Pay Amount</label>
+              <input id="creditPayAmount" type="number" min="0" step="0.01" placeholder="0.00">
+            </div>
+            <div style="flex:1; min-width:180px;">
+              <label for="creditPayNote" style="display:block; font-size:12px; opacity:.8;">Note (optional)</label>
+              <input id="creditPayNote" type="text" placeholder="e.g. cash">
+            </div>
+            <div>
+              <button id="creditPaySubmit" style="background-color:#00C936;">Save Payment</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="billModal" style="display: none;">
+    <div id="billModalBackdrop" class="bills-data-showing-window-content">
+      <div class="bills-data-showing-window-content-modal">
+        <div class="bills-data-showing-window-content-modal-header">
+          <div class="bills-data-showing-window-content-modal-header-content">
+            <h3>Credit Bill Details</h3>
+            <button id="closeBillModal" class="close-btn">&times;</button>
+          </div>
+        </div>
+        <div id="billDetail" class="bill-detail"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const btn = document.getElementById('toggleFiltersBtn');
+      const navbar = document.getElementById('item-or-bills-showing-terminal-window-navbar');
+      let hideTimer = null;
+      if (btn && navbar) {
+        btn.addEventListener('click', () => {
+          const visible = window.getComputedStyle(navbar).display !== 'none';
+          if (visible) {
+            navbar.style.display = 'none';
+            if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+          } else {
+            navbar.style.display = 'block';
+            if (hideTimer) { clearTimeout(hideTimer); }
+            hideTimer = setTimeout(() => { navbar.style.display = 'none'; hideTimer = null; }, 5000);
+          }
+        });
+      }
+    })();
+  </script>
+
+  <script type="module" src="./js/firebase_config.js"></script>
+  <script type="module" src="./js/credit_bills.js"></script>
+</body>
+</html>
+
