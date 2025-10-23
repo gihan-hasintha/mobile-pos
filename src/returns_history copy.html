@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Returns History</title>
+	<link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+	<style>
+		.bill-line {
+			padding-top: 7px;
+			background-color: #ffffff26;
+			color: white;
+			border: none;
+			padding-bottom: 5px;
+		}
+
+		.bill-line-title {
+			color: white;
+			font-weight: 400;
+			font-size: 13px;
+		}
+
+		.bill-line-sub {
+			color: #dcdcdc;
+		}
+	</style>
+	<div id="navigation-bar-for-application-head">
+		<div class="navigation-bar-for-application-head-navbar">
+			<div class="navigation-bar-for-application-head-content">
+				<div class="navigation-bar-for-application-head-content-left" onclick="showcartlistoncashieraddedtocart()">
+						<div class="navigation-bar-for-application-head-content-right-button" onclick="history.back()">
+							<img src="./assets/imgs/keyboard_backspace_50dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+						</div>
+				</div>
+				<div class="navigation-bar-for-application-head-content-center">
+					<div class="navbar-app-LOGO-img">
+						<img src="./assets/imgs/IMAPOS_LOGO.png" alt="">
+					</div>
+				</div>
+				<div class="navigation-bar-for-application-head-content-right">
+					<div class="navigation-bar-for-application-head-content-right-c"></div>
+				</div>
+			</div>
+		</div>
+		<div class="navigation-bar-for-application-head-navbar-space"></div>
+	</div>
+
+	<div id="item-or-bills-showing-terminal-window-navbar" style="display: block;">
+		<div class="item-or-bills-showing-terminal-window-navbar-s" style="top: 40px;">
+		  <div class="item-or-bills-showing-terminal-window-navbar-content">
+			<div class="item-or-bills-showing-terminal-window-navbar-left">
+			  <div class="item-or-bills-showing-terminal-window-navbar-content-txt">Filters</div>
+			  <select id="retFilter">
+				<option value="today">Today</option>
+				<option value="yesterday">Yesterday</option>
+				<option value="thisWeek">This week</option>
+				<option value="thisMonth">This month</option>
+				<option value="all">All time</option>
+			</select>
+			</div>
+			<div class="item-or-bills-showing-terminal-window-navbar-right">
+			  <div class="item-or-bills-showing-terminal-window-navbar-content-txt">Actions</div>
+			  <button id="exportReturnsBtn">Export</button>
+			</div>
+		  </div>
+		</div>
+	  </div>
+
+	<main style="margin-top: 55px;">
+
+		<div class="bill-page-bills-container-space-wc-container">
+			<div id="returnsList" class="bills-container"></div>
+		</div>
+	</main>
+
+	<script type="module" src="./js/firebase_config.js"></script>
+	<script type="module" src="./js/returns_history.js"></script>
+</body>
+</html>

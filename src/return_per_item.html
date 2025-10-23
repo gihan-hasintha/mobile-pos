@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Return Per Item</title>
+	<link rel="stylesheet" href="./css/style.css">
+	<style>
+		/* Custom styling for return handling options */
+		input[name="returnHandling"]:checked + div {
+			background-color: #f8f9fa;
+		}
+		
+		input[name="returnHandling"][value="restore"]:checked ~ div {
+			border-color: #28a745 !important;
+		}
+		
+		input[name="returnHandling"][value="damaged"]:checked ~ div {
+			border-color: #dc3545 !important;
+		}
+		
+		label:hover {
+			background-color: #f8f9fa;
+		}
+	</style>
+</head>
+<body>
+	<div id="navigation-bar-for-application-head">
+		<div class="navigation-bar-for-application-head-navbar">
+		  <div class="navigation-bar-for-application-head-content">
+			<div class="navigation-bar-for-application-head-content-left">
+				<div class="navigation-bar-for-application-head-content-right-button" onclick="history.back()">
+				  <img src="./assets/imgs/keyboard_backspace_50dp_FFFFFF_FILL0_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+				</div>
+			</div>
+			<div class="navigation-bar-for-application-head-content-center">
+			  <div class="navbar-app-LOGO-img">
+				<img src="./assets/imgs/IMAPOS_LOGO.png" alt="">
+			  </div>
+			</div>
+			<div class="navigation-bar-for-application-head-content-right">
+			  <div class="navigation-bar-for-application-head-content-right-c">
+				<a href="./returns_history.html">
+					<div class="navigation-bar-for-application-head-content-right-button">
+						<img src="./assets/imgs/amend_50dp_FFFFFF_FILL1_wght400_GRAD0_opsz48.png" alt="" style="width: 28px;">
+					</div>
+				</a>
+			  </div>
+			</div>
+		  </div>
+		</div>
+		
+		<div class="navigation-bar-for-application-head-navbar-space"></div>
+	  </div>
+
+	<main>
+		<div class="bill-page-bills-container-space-wc-container">
+			<div class="return-per-item-form" style="margin: 0 auto;">
+				<h2 style="text-align: center; margin-bottom: 20px; color: #333;">Return Per Item</h2>
+				
+				<div class="form-group" style="margin-bottom: 20px;">
+					<input type="text" id="itemCodeInput" placeholder="Enter item code" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+					<div style="display: flex; gap: 10px; margin-top: 10px;">
+						<button id="loadItemBtn" style="background-color: #E78B00; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; flex: 1;">Load Item</button>
+						<button id="debugItemsBtn" style="background-color: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; flex: 1;display: none;">Debug Items</button>
+					</div>
+				</div>
+
+				<div id="itemInfo" style="display: none; background-color: #f8f9fa; padding: 15px; border-radius: 4px; margin-bottom: 20px; border: 1px solid #dee2e6;">
+					<div id="itemDetails"></div>
+				</div>
+
+				<div class="form-group" style="margin-bottom: 20px;">
+					<label for="itemNameDisplay" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Item Name (Verification):</label>
+					<input type="text" id="itemNameDisplay" readonly placeholder="Item name will appear here after loading" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; background-color: #f8f9fa; color: #333;">
+				</div>
+
+				<div class="form-group" style="margin-bottom: 20px;">
+					<label for="returnQuantity" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Return Quantity:</label>
+					<input type="number" id="returnQuantity" min="1" placeholder="Enter quantity to return" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+				</div>
+
+				<div class="form-group" style="margin-bottom: 20px;">
+					<label for="returnPrice" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Return Price (Editable):</label>
+					<input type="number" id="returnPrice" step="0.01" min="0" placeholder="Enter return price" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+				</div>
+
+				<div class="form-group" style="margin-bottom: 20px;">
+					<label for="returnReason" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Return Reason:</label>
+					<select id="returnReason" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+						<option value="">Select a reason</option>
+						<option value="defective">Defective Product</option>
+						<option value="wrong_item">Wrong Item</option>
+						<option value="damaged_shipping">Damaged in Shipping</option>
+						<option value="customer_change">Customer Changed Mind</option>
+						<option value="expired">Expired Product</option>
+						<option value="other">Other</option>
+					</select>
+				</div>
+
+				<div class="form-group" style="margin-bottom: 20px;">
+					<label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Return Handling:</label>
+					<div style="display: block; gap: 15px; margin-top: 8px;">
+						<label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; border: 1px solid #ddd; border-radius: 4px; flex: 1; transition: all 0.3s;margin-bottom: 6px;">
+							<input type="radio" name="returnHandling" value="restore" checked style="margin: 0;">
+							<div>
+								<div style="font-weight: bold; color: #28a745;">Restore to Stock</div>
+								<div style="font-size: 12px; color: #666;">Add returned quantity back to inventory</div>
+							</div>
+						</label>
+						<label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; border: 1px solid #ddd; border-radius: 4px; flex: 1; transition: all 0.3s;">
+							<input type="radio" name="returnHandling" value="damaged" style="margin: 0;">
+							<div>
+								<div style="font-weight: bold; color: #dc3545;">Damaged/Dispose</div>
+								<div style="font-size: 12px; color: #666;">Do not add to stock (damaged items)</div>
+							</div>
+						</label>
+					</div>
+				</div>
+
+				<div class="form-group" style="margin-bottom: 20px;">
+					<label for="paymentMethod" style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Payment Method:</label>
+					<select id="paymentMethod" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+						<option value="">Select payment method</option>
+						<option value="cash">Cash</option>
+						<option value="card">Card</option>
+						<option value="credit">Credit</option>
+						<option value="cheque">Cheque</option>
+					</select>
+				</div>
+
+				<button id="saveReturnBtn" style="background-color: #E78B00; color: white; border: none; padding: 15px 30px; border-radius: 4px; cursor: pointer; width: 100%; font-size: 14px;">Save Return</button>
+
+				<div id="returnStatus" style="margin-top: 20px; padding: 10px; border-radius: 4px; text-align: center; display: none;"></div>
+				<div id="spaceforshow-on-application" style="padding-bottom: 50px;"></div>
+			</div>
+		</div>
+	</main>
+
+	<script type="module" src="./js/firebase_config.js"></script>
+	<script type="module" src="./js/return_per_item.js"></script>
+</body>
+</html>
